@@ -7,10 +7,14 @@
 //   freiMitte    true = mittleres Feld ist ein Freifeld (nur bei ungerader Größe sinnvoll)
 //   ziel         'linie' (eine volle Reihe/Spalte/Diagonale gewinnt) oder 'vollbild' (alle Felder)
 //   felder       Liste aller möglichen Felder; es dürfen MEHR sein als auf die Karte passen,
-//                dann wird bei jeder neuen Karte zufällig ausgewählt
+//                dann wird bei jeder neuen Karte zufällig ausgewählt. Ein Eintrag ist entweder ein Text
+//                oder ein Kombi-Feld:
+//                  { text: 'Sprachen, in denen gesungen wird', ab: 3, punkte: ['Deutsch', 'Englisch', …] }
+//                Beim Tippen öffnet sich eine Checkliste mit den punkte (2 bis 12); das Feld zählt als
+//                markiert, sobald mindestens ab Punkte abgehakt sind.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 2;
+const BINGO_DATA_VERSION = 3;
 const BINGO_GAMES = [
   {
     id: 'festival',
@@ -25,7 +29,9 @@ const BINGO_GAMES = [
       'Merch-Schlange', 'Kein Handyempfang', 'Powerbank leer', 'Künstler hat den Text vergessen',
       'Überraschungsgast', 'Pyro auf der Bühne', 'Zwei Bühnen überschneiden sich', 'Lieblingslied verpasst',
       'Frühstück um 14 Uhr', 'Wasserstation leer', 'Shuttle-Bus überfüllt', 'Einlass-Schlange',
-      'Tanzende Security', 'Ohrenstöpsel vergessen'
+      'Tanzende Security', 'Ohrenstöpsel vergessen',
+      { text: 'Sprachen, in denen gesungen wird', ab: 3, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Italienisch', 'Japanisch', 'Portugiesisch'] },
+      { text: 'Wetter erlebt', ab: 3, punkte: ['Sonne', 'Regen', 'Wind', 'Gewitter', 'Nebel', 'Hitze', 'Kälte'] }
     ]
   },
   {
@@ -40,7 +46,9 @@ const BINGO_GAMES = [
       'Gitarrensaite reißt', 'Taschenlampen im Publikum', 'Klatschen im Takt', 'Ballade mit Lichtermeer',
       'Künstler trinkt aus dem Becher', 'Merch-Stand nach dem Konzert', 'Jemand tanzt allein', 'Verspäteter Beginn',
       'Rückkopplung', 'Hit zum Schluss', 'Fotograf im Graben', 'Pyro auf der Bühne',
-      'Jemand ruft nach dem Hit', 'Ausverkauftes Haus', 'Garderoben-Schlange', 'Lieblingslied gespielt'
+      'Jemand ruft nach dem Hit', 'Ausverkauftes Haus', 'Garderoben-Schlange', 'Lieblingslied gespielt',
+      { text: 'Instrumente auf der Bühne', ab: 4, punkte: ['Gitarre', 'Bass', 'Schlagzeug', 'Keyboard', 'Geige', 'Saxofon', 'Trompete', 'Akkordeon'] },
+      { text: 'Sprachen, in denen gesungen wird', ab: 2, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Andere'] }
     ]
   },
   {

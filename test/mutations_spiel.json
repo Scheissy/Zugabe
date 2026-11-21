@@ -3,7 +3,8 @@
   "test/test_spiel_logik.js",
   "test/test_ansicht.js",
   "test/test_storage.js",
-  "test/test_validation.js"
+  "test/test_validation.js",
+  "test/test_kombi.js"
  ],
  "mutations": [
   {
@@ -21,8 +22,8 @@
   {
    "name": "M3 Freifeld lässt sich umschalten",
    "file": "js/03-spiel.js",
-   "old": " || card.cells[p] === null) {\n    return { changed: false",
-   "new": ") {\n    return { changed: false"
+   "old": " || card.cells[p] === null || isComboEntry(card.cells[p])) {",
+   "new": " || isComboEntry(card.cells[p])) {"
   },
   {
    "name": "M4 justWon immer wahr bei Gewinn",
@@ -51,7 +52,7 @@
   {
    "name": "M8 Marks beim Laden nicht bereinigt",
    "file": "js/02-storage.js",
-   "old": ".filter(p => Number.isInteger(p) && p >= 0 && p < total && cells[p] !== null)",
+   "old": ".filter(p => Number.isInteger(p) && p >= 0 && p < total && typeof cells[p] === 'string')",
    "new": ""
   },
   {
@@ -71,6 +72,60 @@
    "file": "js/04-ansicht.js",
    "old": "if (appState.settings.confirmNewCard && hasMarks()) askConfirm('Neue Karte?'",
    "new": "if (hasMarks()) askConfirm('Neue Karte?'"
+  },
+  {
+   "name": "K1 Schwelle: > statt >=",
+   "file": "js/03-spiel.js",
+   "old": "comboCount(card, p) >= c.ab",
+   "new": "comboCount(card, p) > c.ab"
+  },
+  {
+   "name": "K2 toggleCheck ignoriert value",
+   "file": "js/03-spiel.js",
+   "old": "const want = value === undefined ? !has : !!value;",
+   "new": "const want = !has;"
+  },
+  {
+   "name": "K3 Häkchen an Textfeldern beim Laden behalten",
+   "file": "js/02-storage.js",
+   "old": " || !isComboEntry(cells[p])) return;",
+   "new": ") return;"
+  },
+  {
+   "name": "K4 Zähler ignoriert Kombi-Felder",
+   "file": "js/03-spiel.js",
+   "old": "card.marks.length + card.cells.filter((c, p) => isComboEntry(c) && isMarked(card, p)).length",
+   "new": "card.marks.length"
+  },
+  {
+   "name": "K5 ab-Grenze nicht geprüft",
+   "file": "js/01-data.js",
+   "old": "f.ab > p.length",
+   "new": "f.ab > p.length + 5"
+  },
+  {
+   "name": "K6 Punkt-Text nicht maskiert",
+   "file": "js/04-ansicht.js",
+   "old": "<span>${esc(name)}</span></label>",
+   "new": "<span>${name}</span></label>"
+  },
+  {
+   "name": "K7 Zurücksetzen lässt Häkchen stehen",
+   "file": "js/03-spiel.js",
+   "old": "  card.marks = [];\n  card.checks = {};\n",
+   "new": "  card.marks = [];\n"
+  },
+  {
+   "name": "K8 Kombi-Feld lässt sich wie Textfeld markieren",
+   "file": "js/03-spiel.js",
+   "old": " || card.cells[p] === null || isComboEntry(card.cells[p])) {",
+   "new": " || card.cells[p] === null) {"
+  },
+  {
+   "name": "K9 Rückfrage übersieht reine Häkchen",
+   "file": "js/04-ansicht.js",
+   "old": " + Object.keys(card.checks || {}).length > 0",
+   "new": " > 0"
   }
  ]
 }

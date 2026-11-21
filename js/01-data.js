@@ -41,6 +41,29 @@ function felderBenoetigt(game) {
   return game.groesse * game.groesse - freePositions(game).length;
 }
 
+const MAX_PUNKTE = 12;
+// Ein Eintrag in "felder" ist entweder ein Text oder ein Kombi-Feld { text, punkte: [...], ab: Zahl }.
+// Auf der Karte wird daraus eine Zelle { t, p, ab } (gleiche Form für gespeicherte Karten).
+function isComboEntry(f) { return !!f && typeof f === 'object' && !Array.isArray(f); }
+function feldText(f) { return isComboEntry(f) ? f.text : f; }
+
+// Prüft ein Kombi-Feld. Rückgabe: Liste von Fehlertexten (leer = in Ordnung).
+function comboProblems(f) {
+  const out = [];
+  const ok = typeof f.text === 'string' && f.text.trim();
+  const name = ok ? f.text : '(ohne Text)';
+  if (!ok) out.push('Kombi-Feld ohne text');
+  const p = f.punkte;
+  if (!Array.isArray(p) || p.length < 2 || p.length > MAX_PUNKTE || p.some(x => typeof x !== 'string' || !x.trim())) {
+    out.push('Kombi-Feld "' + name + '": punkte braucht 2 bis ' + MAX_PUNKTE + ' nicht-leere Texte');
+  } else {
+    const n = p.map(x => x.trim().toLowerCase());
+    if (n.some((x, k) => n.indexOf(x) !== k)) out.push('Kombi-Feld "' + name + '": doppelte punkte');
+    if (!Number.isInteger(f.ab) || f.ab < 1 || f.ab > p.length) out.push('Kombi-Feld "' + name + '": ab muss eine ganze Zahl von 1 bis ' + p.length + ' sein');
+  }
+  return out;
+}
+
 // Prüft alle Spiele. Rückgabe: Liste von { id, level: 'fehler' | 'hinweis', text }.
 // Spiele mit mindestens einem 'fehler' sind nicht spielbar (siehe playableGames).
 function validateGames(list) {
@@ -56,14 +79,18 @@ function validateGames(list) {
     if (typeof g.titel !== 'string' || !g.titel.trim()) add(id, 'fehler', 'titel fehlt');
     if (!GROESSEN.includes(g.groesse)) add(id, 'fehler', 'groesse muss 3, 4 oder 5 sein');
     if (!ZIELE.includes(g.ziel)) add(id, 'fehler', "ziel muss 'linie' oder 'vollbild' sein");
-    if (!Array.isArray(g.felder) || g.felder.some(f => typeof f !== 'string' || !f.trim())) {
-      add(id, 'fehler', 'felder muss eine Liste nicht-leerer Texte sein');
+    if (!Array.isArray(g.felder) || g.felder.some(f => !(typeof f === 'string' ? f.trim() : isComboEntry(f)))) {
+      add(id, 'fehler', 'felder muss eine Liste aus nicht-leeren Texten oder Kombi-Feldern sein');
       return;
     }
-    const norm = g.felder.map(f => f.trim().toLowerCase());
+    g.felder.filter(isComboEntry).forEach(f => comboProblems(f).forEach(m => add(id, 'fehler', m)));
+    const norm = g.felder.map(f => String(feldText(f)).trim().toLowerCase());
     const dups = norm.filter((f, k) => norm.indexOf(f) !== k);
     if (dups.length) add(id, 'fehler', 'doppelte Felder: ' + [...new Set(dups)].join(', '));
-    if (g.felder.some(f => f.length > MAX_FELD_LEN)) add(id, 'hinweis', 'Feldtext länger als ' + MAX_FELD_LEN + ' Zeichen (wird gekürzt gespeichert)');
+    const tooLong = x => typeof x === 'string' && x.length > MAX_FELD_LEN;
+    if (g.felder.some(f => tooLong(feldText(f)) || (isComboEntry(f) && Array.isArray(f.punkte) && f.punkte.some(tooLong)))) {
+      add(id, 'hinweis', 'Feldtext länger als ' + MAX_FELD_LEN + ' Zeichen (wird gekürzt gespeichert)');
+    }
     if (GROESSEN.includes(g.groesse)) {
       const need = felderBenoetigt(g);
       if (g.felder.length < need) add(id, 'fehler', 'zu wenige Felder: ' + g.felder.length + ' vorhanden, ' + need + ' nötig');

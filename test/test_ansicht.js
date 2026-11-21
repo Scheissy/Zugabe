@@ -111,7 +111,7 @@ const { loadApp, reloadWithState, createChecker, createHelpers } = require('./te
 
   // Neustart öffnet die Karte wieder
   const x = await loadApp(); const XH = createHelpers(x.window, x.document);
-  XH.openGameById('festival'); XH.click(XH.cell(0));
+  XH.openGameById('klubnacht'); XH.click(XH.cell(0));
   const y = await reloadWithState(x.window); const YH = createHelpers(y.window, y.document);
   t.check('Nach Neustart steht die Karte mit derselben Markierung wieder da.', YH.markedPositions().join() === '0' && !y.document.getElementById('view-spiel').classList.contains('hidden'));
   t.check('Während des gesamten Ablaufs gab es keine JS-Fehler.', errors.length === 0, errors);

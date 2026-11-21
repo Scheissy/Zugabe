@@ -9,7 +9,9 @@ const { loadApp, reloadWithState, createChecker, createHelpers } = require('./te
   const ids = w.eval('allGames').map(g => g.id);
   for (const id of ids) {
     w.switchTab('spiele'); H.openGameById(id);
-    H.cells().filter(c => c.tagName === 'BUTTON').forEach(c => H.click(c));      // alles markieren
+    H.cells().filter(c => c.tagName === 'BUTTON').forEach(c => H.click(c));      // alles antippen (Kombi-Felder öffnen ihre Checkliste)
+    [...d.querySelectorAll('#comboList input')].forEach(i => { i.checked = true; i.dispatchEvent(new w.Event('change', { bubbles: true })); });
+    w.closeModal('comboModal');
     H.click(d.getElementById('btnResetMarks'));
     if (H.modalOpen('confirmModal')) H.click(d.getElementById('confirmYes'));
     H.click(d.getElementById('btnNewCard'));

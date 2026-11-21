@@ -60,10 +60,20 @@ button { font-family: inherit; color: inherit; }
 .cell.free { cursor: default; font-style: italic; }
 .cell.win { box-shadow: 0 0 0 2px var(--gold) inset; }
 .cell:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.cell.combo { flex-direction: column; gap: 3px; }
+.cell-progress { font-size: 0.85em; font-weight: 700; opacity: 0.85; white-space: nowrap; }
 .board-actions { display: flex; gap: 8px; margin-top: 14px; }
 .board-actions .prog-quick-btn { flex: 1; }
 .prog-quick-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; cursor: pointer; }
 .prog-quick-btn:active { background: var(--border); }
+
+/* KOMBI-FELD (Checkliste) */
+.combo-progress { font-size: 13px; color: var(--text2); padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); }
+.combo-progress.done { color: var(--accent-ink); background: var(--accent); font-weight: 600; }
+.combo-list { display: flex; flex-direction: column; }
+.combo-row { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--border); font-size: 15px; cursor: pointer; }
+.combo-row:last-child { border-bottom: none; }
+.combo-row input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--accent); flex-shrink: 0; }
 
 /* SETTINGS */
 .io-view { padding: 12px; display: flex; flex-direction: column; gap: 12px; }

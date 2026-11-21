@@ -108,10 +108,15 @@ function renderBoard() {
   }
   const board = document.getElementById('board');
   board.style.setProperty('--n', n);
-  board.innerHTML = card.cells.map((text, p) => {
-    if (text === null) return `<div class="cell n${n} free marked${win.has(p) ? ' win' : ''}" data-p="${p}">Frei</div>`;
+  board.innerHTML = card.cells.map((c, p) => {
+    const w = win.has(p) ? ' win' : '';
+    if (c === null) return `<div class="cell n${n} free marked${w}" data-p="${p}">Frei</div>`;
+    if (isComboEntry(c)) {
+      const k = comboCount(card, p);
+      return `<button type="button" class="cell n${n} combo${isMarked(card, p) ? ' marked' : ''}${w}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${k} von ${c.ab} Häkchen" onclick="openCombo(${p})"><span class="cell-text">${esc(c.t)}</span><span class="cell-progress">☑ ${k}/${c.ab}</span></button>`;
+    }
     const m = card.marks.includes(p);
-    return `<button type="button" class="cell n${n}${m ? ' marked' : ''}${win.has(p) ? ' win' : ''}" data-p="${p}" aria-pressed="${m}" onclick="onCell(${p})">${esc(text)}</button>`;
+    return `<button type="button" class="cell n${n}${m ? ' marked' : ''}${w}" data-p="${p}" aria-pressed="${m}" onclick="onCell(${p})">${esc(c)}</button>`;
   }).join('');
 }
 function onCell(p) {
@@ -121,9 +126,42 @@ function onCell(p) {
   if (r.justWon) showToast('Bingo!');
 }
 
+// ── KOMBI-FELDER: Checkliste im Dialog ───────────────────────────────────────
+let comboPos = -1;
+function openCombo(p) {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[p];
+  if (!isComboEntry(c)) return;
+  comboPos = p;
+  const checked = card.checks[p] || [];
+  document.getElementById('comboTitle').textContent = c.t;
+  document.getElementById('comboList').innerHTML = c.p.map((name, i) =>
+    `<label class="combo-row"><input type="checkbox" data-i="${i}"${checked.includes(i) ? ' checked' : ''} onchange="onComboCheck(${i}, this.checked)"><span>${esc(name)}</span></label>`).join('');
+  updateComboProgress();
+  openModal('comboModal');
+}
+// Nur den Fortschrittstext aktualisieren, damit die Checkboxen (und ihr Fokus) stehen bleiben.
+function updateComboProgress() {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[comboPos];
+  if (!isComboEntry(c)) return;
+  const k = comboCount(card, comboPos);
+  const done = k >= c.ab;
+  const el = document.getElementById('comboProgress');
+  el.textContent = done ? `Geschafft: ${k} von ${c.p.length} abgehakt (nötig: ${c.ab}).` : `${k} von ${c.p.length} abgehakt – ab ${c.ab} zählt das Feld.`;
+  el.classList.toggle('done', done);
+}
+function onComboCheck(i, checked) {
+  const r = toggleCheck(appState.activeGame, comboPos, i, checked);
+  if (!r.changed) return;
+  renderBoard();
+  updateComboProgress();
+  if (r.justWon) showToast('Bingo!');
+}
+
 function hasMarks() {
   const card = appState.cards[appState.activeGame];
-  return !!card && card.marks.length > 0;
+  return !!card && markedCount(card) + Object.keys(card.checks || {}).length > 0;
 }
 function askNewCard() {
   const id = appState.activeGame;

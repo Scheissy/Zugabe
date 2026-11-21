@@ -38,6 +38,23 @@
 </div>
 </div>
 
+<!-- KOMBI-FELD: CHECKLISTE -->
+<div class="modal-backdrop" id="comboModal" onclick="modalBackdropClick(event)">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title" id="comboTitle"></div>
+<button class="modal-close" onclick="closeModal('comboModal')" aria-label="Schließen">✕</button>
+</div>
+<div class="modal-body">
+<div class="combo-progress" id="comboProgress" role="status"></div>
+<div class="combo-list" id="comboList"></div>
+</div>
+<div class="modal-footer">
+<button class="form-btn form-btn-save" onclick="closeModal('comboModal')">Fertig</button>
+</div>
+</div>
+</div>
+
 <div class="modal-backdrop" id="installModal" onclick="modalBackdropClick(event)">
 <div class="modal">
 <div class="modal-header">

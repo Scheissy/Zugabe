@@ -14,6 +14,8 @@ const { loadApp, createChecker } = require('./test-helpers');
   t.check('Spiele mit und ohne Freifeld kommen vor.', games.some(g => w.freePositions(g).length) && games.some(g => !w.freePositions(g).length));
   t.check('Mindestens ein Spiel hat mehr Felder als auf die Karte passen (Zufallsauswahl), mindestens eines genau so viele (alle Felder kommen vor).',
     games.some(g => g.felder.length > w.felderBenoetigt(g)) && games.some(g => g.felder.length === w.felderBenoetigt(g)));
+  t.check('Mindestens ein Spiel enthält Kombi-Felder, alle mit gültiger Schwelle (ab ≤ Anzahl Punkte).',
+    (cs => cs.length >= 2 && cs.every(f => f.ab >= 1 && f.ab <= f.punkte.length))(games.flatMap(g => g.felder).filter(w.isComboEntry)));
   t.check('Die Spieleliste zeigt jedes Spiel genau einmal.', d.querySelectorAll('.game-card').length === games.length);
   t.finish();
 })();

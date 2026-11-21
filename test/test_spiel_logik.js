@@ -11,10 +11,12 @@ const { loadApp, createChecker } = require('./test-helpers');
   const c1 = w.createCard(bahn, 42), c2 = w.createCard(bahn, 42), c3 = w.createCard(bahn, 43);
   t.check('Gleicher Seed ergibt dieselbe Karte, anderer Seed eine andere.', JSON.stringify(c1.cells) === JSON.stringify(c2.cells) && JSON.stringify(c1.cells) !== JSON.stringify(c3.cells));
   t.check('5×5 mit Freifeld: 25 Zellen, Mitte (Position 12) ist null, sonst Text.', c1.cells.length === 25 && c1.cells[12] === null && c1.cells.filter(c => c === null).length === 1);
+  const cellTxt = c => typeof c === 'string' ? c : c.t;
+  const felderTxt = fl => fl.map(f => typeof f === 'string' ? f : f.text);
   t.check('Kein Feld kommt auf einer Karte doppelt vor; alle stammen aus der Feldliste.',
-    new Set(c1.cells.filter(Boolean)).size === 24 && c1.cells.filter(Boolean).every(f => bahn.felder.includes(f)));
+    new Set(c1.cells.filter(Boolean).map(cellTxt)).size === 24 && c1.cells.filter(Boolean).every(c => felderTxt(bahn.felder).includes(cellTxt(c))));
   const v = w.createCard(vollbild, 7);
-  t.check('4×4 ohne Freifeld: 16 Felder, alle Felder des Spiels kommen genau einmal vor.', v.cells.length === 16 && !v.cells.includes(null) && [...v.cells].sort().join('|') === [...vollbild.felder].sort().join('|'));
+  t.check('4×4 ohne Freifeld: 16 Felder, alle Felder des Spiels kommen genau einmal vor.', v.cells.length === 16 && !v.cells.includes(null) && v.cells.map(cellTxt).sort().join('|') === felderTxt(vollbild.felder).sort().join('|'));
   t.check('3×3: Freifeld in der Mitte (Position 4).', w.createCard(walk, 1).cells[4] === null);
   t.check('Neue Karte startet ohne Markierungen.', c1.marks.length === 0);
   let differs = false; for (let s = 1; s < 20; s++) if (w.createCard(vollbild, s).cells.join() !== v.cells.join()) differs = true;
