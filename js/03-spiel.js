@@ -15,13 +15,35 @@ function createCard(game, seed) {
   for (let p = 0; p < total; p++) {
     if (free.includes(p)) { cells.push(null); continue; }
     const f = game.felder[pool[k++]];
-    cells.push(isComboEntry(f) ? { t: f.text, p: f.punkte.slice(), ab: f.ab } : f);
+    cells.push(isComboEntry(f) ? comboCell(f) : f);
   }
-  return { seed: seed, cells: cells, marks: [], checks: {} };
+  return { seed: seed, cells: cells, marks: [], checks: {}, eigene: {} };
 }
 
-// Anzahl abgehakter Punkte eines Kombi-Feldes.
-function comboCount(card, p) { return ((card.checks && card.checks[p]) || []).length; }
+// Zelle aus einem Kombi-Feld der Daten: e = eigene Einträge erlaubt, h = Platzhalter für das Eingabefeld.
+function comboCell(f) {
+  const cell = { t: f.text, p: f.punkte.slice(), ab: f.ab };
+  if (f.eigene === true) {
+    cell.e = true;
+    if (typeof f.eigeneHinweis === 'string' && f.eigeneHinweis.trim()) cell.h = f.eigeneHinweis.trim().slice(0, MAX_EIGENE_LEN);
+  }
+  return cell;
+}
+const normEintrag = s => String(s).trim().toLowerCase();
+function eigeneList(card, p) { return (card.eigene && card.eigene[p]) || []; }
+// Eigene Einträge, die zählen: nicht leer, nicht doppelt und nicht gleich einem festen Punkt.
+function eigeneCount(card, p) {
+  const seen = new Set(card.cells[p].p.map(normEintrag));
+  let n = 0;
+  eigeneList(card, p).forEach(x => { const k = normEintrag(x); if (k && !seen.has(k)) { seen.add(k); n++; } });
+  return n;
+}
+// Anzahl gezählter Punkte eines Kombi-Feldes: abgehakte feste Punkte plus eigene Einträge.
+function comboCount(card, p) {
+  const fixed = ((card.checks && card.checks[p]) || []).length;
+  const c = card.cells[p];
+  return fixed + (isComboEntry(c) && c.e ? eigeneCount(card, p) : 0);
+}
 // Ein Feld zählt als markiert: Freifeld immer, Textfeld nach Tipp, Kombi-Feld ab der geforderten Zahl Häkchen.
 function isMarked(card, p) {
   const c = card.cells[p];
@@ -104,6 +126,21 @@ function toggleCheck(id, p, i, value) {
   });
 }
 
+// Eigene Einträge (Freitext) eines Kombi-Feldes setzen: values ist die komplette Liste der Eingabefelder.
+// Leere Einträge fallen weg, Texte werden gekürzt, höchstens MAX_EIGENE bleiben.
+function setEigene(id, p, values) {
+  const none = { changed: false, won: false, justWon: false };
+  const game = gameById(id);
+  const card = appState.cards[id];
+  if (!game || !card || !Number.isInteger(p) || !isComboEntry(card.cells[p]) || !card.cells[p].e || !Array.isArray(values)) return none;
+  const next = values.filter(v => typeof v === 'string').map(v => v.trim().slice(0, MAX_EIGENE_LEN).trim()).filter(Boolean).slice(0, MAX_EIGENE);
+  if (JSON.stringify(next) === JSON.stringify(eigeneList(card, p))) return none;
+  return applyChange(game, card, () => {
+    card.eigene = card.eigene || {};
+    if (next.length) card.eigene[p] = next; else delete card.eigene[p];
+  });
+}
+
 function newCardFor(id) {
   const game = gameById(id);
   if (!game) return null;
@@ -119,6 +156,7 @@ function resetMarks(id) {
   if (!card) return;
   card.marks = [];
   card.checks = {};
+  card.eigene = {};
   saveToStorage();
 }
 function resetAllCards() {

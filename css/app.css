@@ -75,6 +75,14 @@ button { font-family: inherit; color: inherit; }
 .combo-row:last-child { border-bottom: none; }
 .combo-row input[type=checkbox] { width: 22px; height: 22px; accent-color: var(--accent); flex-shrink: 0; }
 
+.combo-own { margin-top: 12px; }
+.combo-own-title { font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 6px; }
+.combo-own-list { display: flex; flex-direction: column; gap: 8px; }
+.combo-own-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font: inherit; font-size: 15px; padding: 11px 12px; }
+.combo-own-input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.combo-own-input.dup { border-style: dashed; color: var(--text3); }
+.combo-own-hint { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
 /* SETTINGS */
 .io-view { padding: 12px; display: flex; flex-direction: column; gap: 12px; }
 .io-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }

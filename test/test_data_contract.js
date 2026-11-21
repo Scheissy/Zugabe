@@ -16,6 +16,8 @@ const { loadApp, createChecker } = require('./test-helpers');
     games.some(g => g.felder.length > w.felderBenoetigt(g)) && games.some(g => g.felder.length === w.felderBenoetigt(g)));
   t.check('Mindestens ein Spiel enthält Kombi-Felder, alle mit gültiger Schwelle (ab ≤ Anzahl Punkte).',
     (cs => cs.length >= 2 && cs.every(f => f.ab >= 1 && f.ab <= f.punkte.length))(games.flatMap(g => g.felder).filter(w.isComboEntry)));
+  t.check('Die Sprachen-Kombi-Felder erlauben eigene Einträge (Freitext) mit Platzhalter und enthalten keinen Punkt "Andere".',
+    (cs => cs.length >= 2 && cs.every(f => f.eigene === true && f.eigeneHinweis && !f.punkte.includes('Andere')))(games.flatMap(g => g.felder).filter(f => w.isComboEntry(f) && /Sprachen/.test(f.text))));
   t.check('Die Spieleliste zeigt jedes Spiel genau einmal.', d.querySelectorAll('.game-card').length === games.length);
   t.finish();
 })();

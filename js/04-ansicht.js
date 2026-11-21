@@ -128,6 +128,11 @@ function onCell(p) {
 
 // ── KOMBI-FELDER: Checkliste im Dialog ───────────────────────────────────────
 let comboPos = -1;
+function currentCombo() {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[comboPos];
+  return isComboEntry(c) ? { card: card, c: c } : null;
+}
 function openCombo(p) {
   const card = appState.cards[appState.activeGame];
   const c = card && card.cells[p];
@@ -137,19 +142,57 @@ function openCombo(p) {
   document.getElementById('comboTitle').textContent = c.t;
   document.getElementById('comboList').innerHTML = c.p.map((name, i) =>
     `<label class="combo-row"><input type="checkbox" data-i="${i}"${checked.includes(i) ? ' checked' : ''} onchange="onComboCheck(${i}, this.checked)"><span>${esc(name)}</span></label>`).join('');
+  // Eigene Einträge: gespeicherte Texte, danach immer ein leeres Feld für den nächsten
+  document.getElementById('comboOwn').style.display = c.e ? '' : 'none';
+  document.getElementById('comboOwnList').innerHTML = '';
+  if (c.e) { eigeneList(card, p).forEach(v => addOwnInput(v)); fillTrailingInput(); }
   updateComboProgress();
   openModal('comboModal');
 }
-// Nur den Fortschrittstext aktualisieren, damit die Checkboxen (und ihr Fokus) stehen bleiben.
+function ownInputs() { return [...document.querySelectorAll('#comboOwnList .combo-own-input')]; }
+function ownValues() { return ownInputs().map(i => i.value); }
+function addOwnInput(value) {
+  const cur = currentCombo();
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'combo-own-input';
+  input.maxLength = MAX_EIGENE_LEN;
+  input.placeholder = (cur && cur.c.h) || 'Weiteren Punkt eintragen';
+  input.setAttribute('aria-label', input.placeholder);
+  input.setAttribute('autocomplete', 'off');
+  input.setAttribute('oninput', 'onOwnInput()');
+  input.setAttribute('onchange', 'onOwnChange()');
+  input.value = value || '';
+  document.getElementById('comboOwnList').appendChild(input);
+}
+// Es gibt immer genau ein leeres Feld am Ende - bis MAX_EIGENE Felder erreicht sind.
+function fillTrailingInput() {
+  let inputs = ownInputs();
+  while (inputs.length > 1 && !inputs[inputs.length - 1].value.trim() && !inputs[inputs.length - 2].value.trim()) {
+    inputs[inputs.length - 1].remove();
+    inputs = ownInputs();
+  }
+  if (!inputs.length || (inputs[inputs.length - 1].value.trim() && inputs.length < MAX_EIGENE)) addOwnInput('');
+}
+// Nur den Fortschrittstext aktualisieren, damit Checkboxen und Eingabefelder (und ihr Fokus) stehen bleiben.
 function updateComboProgress() {
-  const card = appState.cards[appState.activeGame];
-  const c = card && card.cells[comboPos];
-  if (!isComboEntry(c)) return;
+  const cur = currentCombo();
+  if (!cur) return;
+  const { card, c } = cur;
   const k = comboCount(card, comboPos);
   const done = k >= c.ab;
   const el = document.getElementById('comboProgress');
-  el.textContent = done ? `Geschafft: ${k} von ${c.p.length} abgehakt (nötig: ${c.ab}).` : `${k} von ${c.p.length} abgehakt – ab ${c.ab} zählt das Feld.`;
+  if (c.e) el.textContent = done ? `Geschafft: ${k} gezählt (nötig: ${c.ab}).` : `${k} gezählt – ab ${c.ab} zählt das Feld.`;
+  else el.textContent = done ? `Geschafft: ${k} von ${c.p.length} abgehakt (nötig: ${c.ab}).` : `${k} von ${c.p.length} abgehakt – ab ${c.ab} zählt das Feld.`;
   el.classList.toggle('done', done);
+  if (c.e) { // doppelte Einträge zählen nicht - sichtbar machen
+    const seen = new Set(c.p.map(normEintrag));
+    ownInputs().forEach(inp => {
+      const key = normEintrag(inp.value);
+      inp.classList.toggle('dup', !!key && seen.has(key));
+      if (key) seen.add(key);
+    });
+  }
 }
 function onComboCheck(i, checked) {
   const r = toggleCheck(appState.activeGame, comboPos, i, checked);
@@ -158,10 +201,27 @@ function onComboCheck(i, checked) {
   updateComboProgress();
   if (r.justWon) showToast('Bingo!');
 }
+// Tippen in einem Eingabefeld: sofort speichern, neues leeres Feld ergänzen.
+function onOwnInput() {
+  const r = setEigene(appState.activeGame, comboPos, ownValues());
+  fillTrailingInput();
+  if (r.changed) {
+    renderBoard();
+    if (r.justWon) showToast('Bingo!');
+  }
+  updateComboProgress();
+}
+// Feld verlassen: leere Felder mitten in der Liste aufräumen (das Feld mit dem Fokus bleibt).
+function onOwnChange() {
+  const inputs = ownInputs();
+  inputs.forEach((el, i) => { if (!el.value.trim() && i < inputs.length - 1 && el !== document.activeElement) el.remove(); });
+  fillTrailingInput();
+  updateComboProgress();
+}
 
 function hasMarks() {
   const card = appState.cards[appState.activeGame];
-  return !!card && markedCount(card) + Object.keys(card.checks || {}).length > 0;
+  return !!card && markedCount(card) + Object.keys(card.checks || {}).length + Object.keys(card.eigene || {}).length > 0;
 }
 function askNewCard() {
   const id = appState.activeGame;

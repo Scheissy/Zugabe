@@ -12,9 +12,13 @@
 //                  { text: 'Sprachen, in denen gesungen wird', ab: 3, punkte: ['Deutsch', 'Englisch', …] }
 //                Beim Tippen öffnet sich eine Checkliste mit den punkte (2 bis 12); das Feld zählt als
 //                markiert, sobald mindestens ab Punkte abgehakt sind.
+//                Optional: eigene: true erlaubt zusätzlich bis zu 10 selbst eingetragene Einträge (Freitext,
+//                nach jedem ausgefüllten Feld erscheint ein neues); sie zählen wie abgehakte Punkte.
+//                eigeneHinweis ist der Platzhaltertext im Eingabefeld. Mit eigene: true darf punkte auch
+//                weniger als 2 Einträge haben, und ab darf bis punkte + 10 gehen.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 3;
+const BINGO_DATA_VERSION = 4;
 const BINGO_GAMES = [
   {
     id: 'festival',
@@ -30,7 +34,7 @@ const BINGO_GAMES = [
       'Überraschungsgast', 'Pyro auf der Bühne', 'Zwei Bühnen überschneiden sich', 'Lieblingslied verpasst',
       'Frühstück um 14 Uhr', 'Wasserstation leer', 'Shuttle-Bus überfüllt', 'Einlass-Schlange',
       'Tanzende Security', 'Ohrenstöpsel vergessen',
-      { text: 'Sprachen, in denen gesungen wird', ab: 3, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Italienisch', 'Japanisch', 'Portugiesisch'] },
+      { text: 'Sprachen, in denen gesungen wird', ab: 3, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Italienisch', 'Japanisch', 'Portugiesisch'], eigene: true, eigeneHinweis: 'Weitere Sprache' },
       { text: 'Wetter erlebt', ab: 3, punkte: ['Sonne', 'Regen', 'Wind', 'Gewitter', 'Nebel', 'Hitze', 'Kälte'] }
     ]
   },
@@ -48,7 +52,7 @@ const BINGO_GAMES = [
       'Rückkopplung', 'Hit zum Schluss', 'Fotograf im Graben', 'Pyro auf der Bühne',
       'Jemand ruft nach dem Hit', 'Ausverkauftes Haus', 'Garderoben-Schlange', 'Lieblingslied gespielt',
       { text: 'Instrumente auf der Bühne', ab: 4, punkte: ['Gitarre', 'Bass', 'Schlagzeug', 'Keyboard', 'Geige', 'Saxofon', 'Trompete', 'Akkordeon'] },
-      { text: 'Sprachen, in denen gesungen wird', ab: 2, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Andere'] }
+      { text: 'Sprachen, in denen gesungen wird', ab: 2, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch'], eigene: true, eigeneHinweis: 'Weitere Sprache' }
     ]
   },
   {

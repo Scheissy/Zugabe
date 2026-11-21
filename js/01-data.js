@@ -42,24 +42,32 @@ function felderBenoetigt(game) {
 }
 
 const MAX_PUNKTE = 12;
+const MAX_EIGENE = 10;        // so viele eigene Einträge sind in einem Kombi-Feld mit eigene: true möglich
+const MAX_EIGENE_LEN = 40;    // Länge eines eigenen Eintrags
 // Ein Eintrag in "felder" ist entweder ein Text oder ein Kombi-Feld { text, punkte: [...], ab: Zahl }.
 // Auf der Karte wird daraus eine Zelle { t, p, ab } (gleiche Form für gespeicherte Karten).
 function isComboEntry(f) { return !!f && typeof f === 'object' && !Array.isArray(f); }
 function feldText(f) { return isComboEntry(f) ? f.text : f; }
 
 // Prüft ein Kombi-Feld. Rückgabe: Liste von Fehlertexten (leer = in Ordnung).
+// Mit eigene: true darf man zusätzlich eigene Einträge eintragen (Freitext); sie zählen wie abgehakte Punkte.
 function comboProblems(f) {
   const out = [];
   const ok = typeof f.text === 'string' && f.text.trim();
   const name = ok ? f.text : '(ohne Text)';
   if (!ok) out.push('Kombi-Feld ohne text');
+  if (f.eigene !== undefined && typeof f.eigene !== 'boolean') out.push('Kombi-Feld "' + name + '": eigene muss true oder false sein');
+  if (f.eigeneHinweis !== undefined && typeof f.eigeneHinweis !== 'string') out.push('Kombi-Feld "' + name + '": eigeneHinweis muss ein Text sein');
+  const eig = f.eigene === true;
+  const minP = eig ? 0 : 2;
   const p = f.punkte;
-  if (!Array.isArray(p) || p.length < 2 || p.length > MAX_PUNKTE || p.some(x => typeof x !== 'string' || !x.trim())) {
-    out.push('Kombi-Feld "' + name + '": punkte braucht 2 bis ' + MAX_PUNKTE + ' nicht-leere Texte');
+  if (!Array.isArray(p) || p.length < minP || p.length > MAX_PUNKTE || p.some(x => typeof x !== 'string' || !x.trim())) {
+    out.push('Kombi-Feld "' + name + '": punkte braucht ' + minP + ' bis ' + MAX_PUNKTE + ' nicht-leere Texte');
   } else {
     const n = p.map(x => x.trim().toLowerCase());
     if (n.some((x, k) => n.indexOf(x) !== k)) out.push('Kombi-Feld "' + name + '": doppelte punkte');
-    if (!Number.isInteger(f.ab) || f.ab < 1 || f.ab > p.length) out.push('Kombi-Feld "' + name + '": ab muss eine ganze Zahl von 1 bis ' + p.length + ' sein');
+    const maxAb = p.length + (eig ? MAX_EIGENE : 0);
+    if (!Number.isInteger(f.ab) || f.ab < 1 || f.ab > maxAb) out.push('Kombi-Feld "' + name + '": ab muss eine ganze Zahl von 1 bis ' + maxAb + ' sein');
   }
   return out;
 }

@@ -4,7 +4,8 @@
   "test/test_ansicht.js",
   "test/test_storage.js",
   "test/test_validation.js",
-  "test/test_kombi.js"
+  "test/test_kombi.js",
+  "test/test_kombi_eigene.js"
  ],
  "mutations": [
   {
@@ -100,8 +101,8 @@
   {
    "name": "K5 ab-Grenze nicht geprüft",
    "file": "js/01-data.js",
-   "old": "f.ab > p.length",
-   "new": "f.ab > p.length + 5"
+   "old": "f.ab > maxAb",
+   "new": "f.ab > maxAb + 5"
   },
   {
    "name": "K6 Punkt-Text nicht maskiert",
@@ -124,8 +125,68 @@
   {
    "name": "K9 Rückfrage übersieht reine Häkchen",
    "file": "js/04-ansicht.js",
-   "old": " + Object.keys(card.checks || {}).length > 0",
+   "old": " + Object.keys(card.checks || {}).length",
+   "new": ""
+  },
+  {
+   "name": "E1 Doppelte eigene Einträge zählen mehrfach",
+   "file": "js/03-spiel.js",
+   "old": "if (k && !seen.has(k)) { seen.add(k); n++; }",
+   "new": "if (k) { seen.add(k); n++; }"
+  },
+  {
+   "name": "E2 Höchstzahl eigener Einträge nicht begrenzt",
+   "file": "js/03-spiel.js",
+   "old": ".filter(Boolean).slice(0, MAX_EIGENE);\n  if (JSON.stringify(next)",
+   "new": ".filter(Boolean);\n  if (JSON.stringify(next)"
+  },
+  {
+   "name": "E3 Eigene Einträge an Kombi-Feldern ohne e bleiben beim Laden",
+   "file": "js/02-storage.js",
+   "old": " || !cells[p].e) return;",
+   "new": ") return;"
+  },
+  {
+   "name": "E4 Kein neues Eingabefeld nach dem Ausfüllen",
+   "file": "js/04-ansicht.js",
+   "old": "if (!inputs.length || (inputs[inputs.length - 1].value.trim() && inputs.length < MAX_EIGENE)) addOwnInput('');",
+   "new": "if (!inputs.length) addOwnInput('');"
+  },
+  {
+   "name": "E5 Eingabefelder wachsen über die Höchstzahl hinaus",
+   "file": "js/04-ansicht.js",
+   "old": "inputs[inputs.length - 1].value.trim() && inputs.length < MAX_EIGENE)) addOwnInput('');",
+   "new": "inputs[inputs.length - 1].value.trim())) addOwnInput('');"
+  },
+  {
+   "name": "E6 Zurücksetzen lässt eigene Einträge stehen",
+   "file": "js/03-spiel.js",
+   "old": "  card.checks = {};\n  card.eigene = {};\n",
+   "new": "  card.checks = {};\n"
+  },
+  {
+   "name": "E7 ab-Grenze ignoriert eigene Einträge",
+   "file": "js/01-data.js",
+   "old": "const maxAb = p.length + (eig ? MAX_EIGENE : 0);",
+   "new": "const maxAb = p.length;"
+  },
+  {
+   "name": "E8 Doppelte Einträge werden nicht markiert",
+   "file": "js/04-ansicht.js",
+   "old": "inp.classList.toggle('dup', !!key && seen.has(key));",
+   "new": "inp.classList.toggle('dup', false);"
+  },
+  {
+   "name": "E9 Rückfrage übersieht reine eigene Einträge",
+   "file": "js/04-ansicht.js",
+   "old": " + Object.keys(card.eigene || {}).length > 0",
    "new": " > 0"
+  },
+  {
+   "name": "E10 Platzhalter aus eigeneHinweis wird ignoriert",
+   "file": "js/04-ansicht.js",
+   "old": "input.placeholder = (cur && cur.c.h) || 'Weiteren Punkt eintragen';",
+   "new": "input.placeholder = 'Weiteren Punkt eintragen';"
   }
  ]
 }

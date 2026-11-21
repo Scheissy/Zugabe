@@ -4,7 +4,8 @@
 
 const DEFAULT_SETTINGS = { confirmNewCard: true, showCounter: true };
 // cards[gameId] = { seed, cells: [Text | Kombi-Feld { t, p, ab } | null (Freifeld)], marks: [Positionen von Textfeldern],
-//                    checks: { Position: [Nummern der abgehakten Punkte] } }
+//                    checks: { Position: [Nummern der abgehakten Punkte] },
+//                    eigene: { Position: [selbst eingetragene Texte] } (nur Kombi-Felder mit e: true) }
 // Die Feldtexte werden mitgespeichert: eine laufende Karte bleibt auch dann gleich, wenn bingo-data.js geändert wird.
 let appState = { cards: {}, settings: { ...DEFAULT_SETTINGS }, activeGame: '' };
 let stateVersion = 0;
@@ -14,9 +15,16 @@ let stateVersion = 0;
 function sanitizeCell(c) {
   if (c === null) return null;
   if (typeof c === 'string') return c ? c.slice(0, MAX_FELD_LEN) : undefined;
-  if (!isComboEntry(c) || typeof c.t !== 'string' || !c.t || !Array.isArray(c.p) || c.p.length < 2 || c.p.length > MAX_PUNKTE
-    || c.p.some(x => typeof x !== 'string' || !x) || !Number.isInteger(c.ab) || c.ab < 1 || c.ab > c.p.length) return undefined;
-  return { t: c.t.slice(0, MAX_FELD_LEN), p: c.p.map(x => x.slice(0, MAX_FELD_LEN)), ab: c.ab };
+  if (!isComboEntry(c) || typeof c.t !== 'string' || !c.t || !Array.isArray(c.p)) return undefined;
+  const eig = c.e === true;
+  if (c.p.length < (eig ? 0 : 2) || c.p.length > MAX_PUNKTE || c.p.some(x => typeof x !== 'string' || !x)
+    || !Number.isInteger(c.ab) || c.ab < 1 || c.ab > c.p.length + (eig ? MAX_EIGENE : 0)) return undefined;
+  const out = { t: c.t.slice(0, MAX_FELD_LEN), p: c.p.map(x => x.slice(0, MAX_FELD_LEN)), ab: c.ab };
+  if (eig) {
+    out.e = true;
+    if (typeof c.h === 'string' && c.h.trim()) out.h = c.h.trim().slice(0, MAX_EIGENE_LEN);
+  }
+  return out;
 }
 
 // Macht aus einem gespeicherten Eintrag eine gültige Karte - oder null, wenn er nicht zum Spiel passt.
@@ -43,7 +51,17 @@ function sanitizeCard(game, raw) {
     const idx = [...new Set((Array.isArray(rc[k]) ? rc[k] : []).filter(i => Number.isInteger(i) && i >= 0 && i < cells[p].p.length))].sort((a, b) => a - b);
     if (idx.length) checks[p] = idx;
   });
-  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks };
+  // Eigene Einträge (Freitext) gibt es nur bei Kombi-Feldern mit e: true.
+  const eigene = {};
+  const re = raw.eigene && typeof raw.eigene === 'object' && !Array.isArray(raw.eigene) ? raw.eigene : {};
+  Object.keys(re).forEach(k => {
+    const p = Number(k);
+    if (!Number.isInteger(p) || String(p) !== k || !isComboEntry(cells[p]) || !cells[p].e) return;
+    const list = (Array.isArray(re[k]) ? re[k] : []).filter(x => typeof x === 'string')
+      .map(x => x.trim().slice(0, MAX_EIGENE_LEN).trim()).filter(Boolean).slice(0, MAX_EIGENE);
+    if (list.length) eigene[p] = list;
+  });
+  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene };
 }
 
 function saveToStorage() {
