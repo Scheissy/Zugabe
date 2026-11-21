@@ -1,0 +1,8 @@
+{
+  "name": "zugabe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zugabe – Bingo für Konzerte (PWA)",
+  "scripts": { "test": "./test/run-tests.sh" },
+  "devDependencies": { "jsdom": "^31.0.0" }
+}

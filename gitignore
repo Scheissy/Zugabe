@@ -1,0 +1,5 @@
+# Platzhalter für lokale Build-Artefakte (keine Projektdateien).
+# Beim Einchecken über die GitHub-Weboberfläche heißt die Datei "gitignore" (ohne Punkt) - wie in rbf2027.
+node_modules/
+package-lock.json
+preview.html

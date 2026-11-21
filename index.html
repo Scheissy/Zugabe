@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zugabe">
+<title>Zugabe</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="topbar">
+<div>
+<div class="topbar-title">Zugabe</div>
+<div class="topbar-sub" id="topbarSub">Bingo für Konzerte</div>
+</div>
+<span id="saveIndicator" class="save-indicator"></span>
+</div>
+
+<!-- BESTÄTIGUNGS-MODAL (neue Karte, Felder zurücksetzen, alles zurücksetzen) -->
+<div class="modal-backdrop" id="confirmModal" onclick="modalBackdropClick(event)">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title" id="confirmTitle">Sicher?</div>
+<button class="modal-close" onclick="closeModal('confirmModal')" aria-label="Schließen">✕</button>
+</div>
+<div class="modal-body" id="confirmText" style="font-size:14px;line-height:1.5"></div>
+<div class="modal-footer">
+<button class="form-btn form-btn-cancel" onclick="closeModal('confirmModal')">Abbrechen</button>
+<button class="form-btn form-btn-save" id="confirmYes" onclick="runConfirm()">Ja</button>
+</div>
+</div>
+</div>
+
+<div class="modal-backdrop" id="installModal" onclick="modalBackdropClick(event)">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title">App installieren</div>
+<button class="modal-close" onclick="closeModal('installModal')" aria-label="Schließen">✕</button>
+</div>
+<div class="install-tabs" id="installTabs"></div>
+<div class="modal-body" id="installModalBody" style="padding-top:4px"></div>
+</div>
+</div>
+
+<!-- SPIELE -->
+<div id="view-spiele" class="view">
+<div class="game-list" id="gameList"></div>
+</div>
+
+<!-- SPIEL -->
+<div id="view-spiel" class="view hidden">
+<div class="board-empty" id="boardEmpty">
+<p>Noch kein Spiel gewählt.</p>
+<button type="button" class="prog-quick-btn" onclick="switchTab('spiele')">Zu den Spielen</button>
+</div>
+<div class="board-wrap" id="boardContent" style="display:none">
+<div class="board-head">
+<div class="board-title" id="boardTitle"></div>
+<div class="board-meta" id="boardMeta"></div>
+</div>
+<div class="board-banner" id="boardBanner" role="status" style="display:none"></div>
+<div class="board" id="board"></div>
+<div class="board-actions">
+<button type="button" class="prog-quick-btn" id="btnResetMarks" onclick="askResetMarks()">Markierungen löschen</button>
+<button type="button" class="prog-quick-btn" id="btnNewCard" onclick="askNewCard()">Neue Karte</button>
+</div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div id="view-settings" class="view hidden">
+<div class="io-view">
+<div class="io-section">
+<div class="io-section-title">Anzeige und Verhalten</div>
+<label class="settings-toggle-row">
+<div class="settings-toggle-text">
+<div class="settings-toggle-label">Rückfrage bei neuer Karte</div>
+<div class="settings-toggle-desc">Vor „Neue Karte“ und „Markierungen löschen“ nachfragen, wenn schon etwas markiert ist</div>
+</div>
+<input type="checkbox" id="settingConfirmNewCard" checked onchange="toggleSetting('confirmNewCard', this.checked)">
+</label>
+<label class="settings-toggle-row">
+<div class="settings-toggle-text">
+<div class="settings-toggle-label">Zähler anzeigen</div>
+<div class="settings-toggle-desc">Wie viele Felder markiert sind, über der Karte und in der Spieleliste</div>
+</div>
+<input type="checkbox" id="settingShowCounter" checked onchange="toggleSetting('showCounter', this.checked)">
+</label>
+</div>
+<div class="io-section">
+<div class="io-section-title">App installieren</div>
+<div style="padding:14px">
+<div class="io-hint">Als eigene App auf dem Startbildschirm installieren – läuft dann wie eine normale App, auch offline.</div>
+<button class="prog-quick-btn" onclick="openInstallModal()" style="width:100%">Anleitung anzeigen</button>
+</div>
+</div>
+<div class="io-section">
+<div class="io-section-title">Datenqualität</div>
+<div style="padding:14px">
+<div class="io-hint">Prüft die Spiele in bingo-data.js (doppelte Felder, zu wenige Felder, ungültige Größe). Spiele mit Fehlern werden nicht angeboten.</div>
+<div id="validationPanel"></div>
+</div>
+</div>
+<div class="io-section">
+<div class="io-section-title">Zurücksetzen</div>
+<div class="io-btn" onclick="askResetAll()">
+<div class="io-btn-text">
+<div class="io-btn-label">Alle Karten und Markierungen löschen</div>
+<div class="io-btn-desc">Setzt den Spielstand aller Spiele zurück, die Einstellungen bleiben</div>
+</div>
+</div>
+</div>
+<div class="info-box">
+<b>Automatisches Speichern</b><br>
+Karten und Markierungen werden automatisch auf diesem Gerät gespeichert und bleiben nach dem Schließen der App erhalten.
+</div>
+<div class="info-box" style="margin-top:0">
+<b>Datenquelle</b><br>
+Alle Spiele und Felder stehen in bingo-data.js und werden zentral gepflegt – es gibt keinen Import in der App.
+</div>
+</div>
+</div>
+
+<div class="bottomnav">
+<div class="nav-btn active" id="nav-spiele" onclick="switchTab('spiele')"><div class="nav-icon">▦</div><div>Spiele</div></div>
+<div class="nav-btn" id="nav-spiel" onclick="switchTab('spiel')"><div class="nav-icon">✚</div><div>Karte</div></div>
+<div class="nav-btn" id="nav-settings" onclick="switchTab('settings')"><div class="nav-icon">⚙</div><div>Settings</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="bingo-data.js"></script>
+<script src="js/01-data.js"></script>
+<script src="js/02-storage.js"></script>
+<script src="js/03-spiel.js"></script>
+<script src="js/04-ansicht.js"></script>
+<script src="js/05-einstellungen.js"></script>
+<script src="js/99-main.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+{
+ "tests": [
+  "test/test_spiel_logik.js",
+  "test/test_ansicht.js",
+  "test/test_storage.js",
+  "test/test_validation.js"
+ ],
+ "mutations": [
+  {
+   "name": "M1 Gegendiagonale falsch",
+   "file": "js/03-spiel.js",
+   "old": "i * n + (n - 1 - i)",
+   "new": "i * n + i"
+  },
+  {
+   "name": "M2 Vollbild zählt wie Linie",
+   "file": "js/03-spiel.js",
+   "old": "return game.ziel === 'vollbild' ? isComplete(card) : winningLines(card, game.groesse).length > 0;",
+   "new": "return winningLines(card, game.groesse).length > 0;"
+  },
+  {
+   "name": "M3 Freifeld lässt sich umschalten",
+   "file": "js/03-spiel.js",
+   "old": " || card.cells[p] === null) {\n    return { changed: false",
+   "new": ") {\n    return { changed: false"
+  },
+  {
+   "name": "M4 justWon immer wahr bei Gewinn",
+   "file": "js/03-spiel.js",
+   "old": "justWon: after && !before",
+   "new": "justWon: after"
+  },
+  {
+   "name": "M5 Freifeld auch bei gerader Größe",
+   "file": "js/01-data.js",
+   "old": "game.freiMitte && game.groesse % 2 === 1",
+   "new": "game.freiMitte"
+  },
+  {
+   "name": "M6 Anführungszeichen nicht maskiert",
+   "file": "js/01-data.js",
+   "old": "'\"': '&quot;', ",
+   "new": ""
+  },
+  {
+   "name": "M7 Doppelte Felder werden nicht gemeldet",
+   "file": "js/01-data.js",
+   "old": "if (dups.length) add(",
+   "new": "if (false) add("
+  },
+  {
+   "name": "M8 Marks beim Laden nicht bereinigt",
+   "file": "js/02-storage.js",
+   "old": ".filter(p => Number.isInteger(p) && p >= 0 && p < total && cells[p] !== null)",
+   "new": ""
+  },
+  {
+   "name": "M9 Karte zu unbekanntem Spiel geht verloren",
+   "file": "js/02-storage.js",
+   "old": "const card = game ? sanitizeCard(game, data.cards[id]) : data.cards[id];",
+   "new": "const card = game ? sanitizeCard(game, data.cards[id]) : null;"
+  },
+  {
+   "name": "M10 Hintergrund-Tipp schließt auch bei Tipp auf die Karte",
+   "file": "js/04-ansicht.js",
+   "old": "if (el && el.classList && el.classList.contains('modal-backdrop')) closeModal(el.id);",
+   "new": "if (el) closeModal(el.id);"
+  },
+  {
+   "name": "M11 Rückfrage ignoriert die Einstellung",
+   "file": "js/04-ansicht.js",
+   "old": "if (appState.settings.confirmNewCard && hasMarks()) askConfirm('Neue Karte?'",
+   "new": "if (hasMarks()) askConfirm('Neue Karte?'"
+  }
+ ]
+}
