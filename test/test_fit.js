@@ -131,8 +131,21 @@ const { ROOT, loadApp, reloadWithState, createChecker, createHelpers } = require
   t.check('Zoom ist nach unten auf 100 % begrenzt.', w.eval('boardZoom') === 100);
   w.setZoom(NaN); w.setZoom(undefined);
   t.check('Ungültige Zoomwerte ändern nichts und werfen keinen Fehler.', w.eval('boardZoom') === 100);
-  w.setZoom(250); H.click(d.getElementById('zoomVal'));
-  t.check('Tipp auf die Prozentanzeige setzt den Zoom auf 100 % zurück.', w.eval('boardZoom') === 100 && !sc.classList.contains('zoomed'));
+  const presetBtns = () => [...d.querySelectorAll('#zoomPresets .zoom-preset')];
+  const presetBtn = z => presetBtns().find(b => +b.dataset.zoom === z);
+  t.check('Stufen-Buttons: 100 %, 200 %, 300 % und 400 % - passend zu ZOOM_PRESETS und innerhalb der Grenzen.', JSON.stringify(presetBtns().map(b => b.textContent)) === '["100 %","200 %","300 %","400 %"]' && JSON.stringify(presetBtns().map(b => +b.dataset.zoom)) === JSON.stringify(w.eval('ZOOM_PRESETS')) && w.eval('ZOOM_PRESETS').every(z => z >= 100 && z <= 400) && w.eval('ZOOM_PRESETS.includes(ZOOM_MIN) && ZOOM_PRESETS.includes(ZOOM_MAX)'));
+  t.check('Am Anfang ist die Stufe 100 % hervorgehoben (aria-pressed), die anderen nicht.', presetBtns().map(b => b.getAttribute('aria-pressed')).join() === 'true,false,false,false' && presetBtn(100).classList.contains('on') && presetBtns().filter(b => b.classList.contains('on')).length === 1);
+  H.click(presetBtn(300));
+  t.check('Stufe 300 %: Zoom 300 %, Anzeige "300 %", genau diese Stufe hervorgehoben, Rahmen scrollbar.', w.eval('boardZoom') === 300 && d.getElementById('zoomVal').textContent === '300 %' && presetBtns().map(b => b.getAttribute('aria-pressed')).join() === 'false,false,true,false' && presetBtn(300).classList.contains('on') && sc.classList.contains('zoomed') && board.style.width === '300%');
+  H.click(presetBtn(200));
+  t.check('Stufe 200 % springt direkt (nicht schrittweise) auf 200 %.', w.eval('boardZoom') === 200 && presetBtn(200).classList.contains('on') && !presetBtn(300).classList.contains('on'));
+  H.click(presetBtn(400));
+  t.check('Stufe 400 % (Maximum): Zoom 400 %, Plus gesperrt, Minus frei.', w.eval('boardZoom') === 400 && d.getElementById('zoomIn').disabled && !d.getElementById('zoomOut').disabled && presetBtn(400).classList.contains('on'));
+  w.setZoom(156);
+  t.check('Zwischenwert (z. B. nach Zwei-Finger-Zoom): die Anzeige nennt den genauen Wert, keine Stufe ist hervorgehoben.', d.getElementById('zoomVal').textContent === '156 %' && presetBtns().every(b => !b.classList.contains('on') && b.getAttribute('aria-pressed') === 'false'));
+  H.click(presetBtn(100));
+  t.check('Der 100-%-Button setzt auf das ganze Spielfeld zurück: Rahmen nicht mehr gezoomt, Minus gesperrt, Stufe 100 % hervorgehoben.', w.eval('boardZoom') === 100 && !sc.classList.contains('zoomed') && board.style.width === '100%' && d.getElementById('zoomOut').disabled && presetBtn(100).classList.contains('on') && d.getElementById('zoomVal').textContent === '100 %');
+  t.check('Die Prozentanzeige ist keine Taste mehr (reiner Text).', d.getElementById('zoomVal').tagName === 'SPAN');
 
   // Zoom → größere Felder → mehr Text
   Object.defineProperty(w.HTMLElement.prototype, 'clientWidth', { configurable: true, get() { return this.classList && this.classList.contains('cell') ? Math.round(38 * w.eval('boardZoom') / 100) : 0; } });

@@ -134,7 +134,12 @@ window.addEventListener('orientationchange', fitBoardSoon);
 
 // ── ZOOM (nur das Spielfeld) ─────────────────────────────────────────────────
 const ZOOM_MIN = 100, ZOOM_MAX = 400;
+const ZOOM_PRESETS = [100, 200, 300, 400];   // Stufen-Buttons; 100 % = zurück auf das ganze Spielfeld
 let boardZoom = 100;
+function buildZoomPresets() {
+  document.getElementById('zoomPresets').innerHTML = ZOOM_PRESETS.map(z =>
+    `<button type="button" class="zoom-btn zoom-preset" data-zoom="${z}" onclick="setZoom(${z})" title="${z === ZOOM_MIN ? 'Ganzes Spielfeld (zurück auf 100 %)' : 'Auf ' + z + ' % zoomen'}">${z} %</button>`).join('');
+}
 function applyZoom() {
   const board = document.getElementById('board'), sc = document.getElementById('boardScroll');
   board.style.width = boardZoom + '%';
@@ -142,6 +147,11 @@ function applyZoom() {
   document.getElementById('zoomVal').textContent = boardZoom + ' %';
   document.getElementById('zoomOut').disabled = boardZoom <= ZOOM_MIN;
   document.getElementById('zoomIn').disabled = boardZoom >= ZOOM_MAX;
+  document.querySelectorAll('.zoom-preset').forEach(b => {
+    const on = +b.dataset.zoom === boardZoom;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
 }
 // z in Prozent; fx/fy = Brennpunkt im Rahmen (Standard: Mitte), der beim Zoomen an derselben Stelle bleibt.
 function setZoom(z, fx, fy) {
@@ -177,3 +187,6 @@ function resetZoom() { boardZoom = 100; applyZoom(); }
   sc.addEventListener('touchend', end);
   sc.addEventListener('touchcancel', end);
 })();
+
+buildZoomPresets();
+applyZoom();

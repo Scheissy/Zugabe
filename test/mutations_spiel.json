@@ -315,6 +315,30 @@
    "file": "js/06-passung.js",
    "old": "if (res.cut || res.variant > 0) {",
    "new": "if (false) {"
+  },
+  {
+   "name": "P1 Aktive Zoomstufe wird nicht hervorgehoben",
+   "file": "js/06-passung.js",
+   "old": "    b.classList.toggle('on', on);\n",
+   "new": ""
+  },
+  {
+   "name": "P2 aria-pressed der Zoomstufen wird nicht gepflegt",
+   "file": "js/06-passung.js",
+   "old": "    b.setAttribute('aria-pressed', String(on));\n",
+   "new": ""
+  },
+  {
+   "name": "P3 Stufen-Button springt auf falschen Wert",
+   "file": "js/06-passung.js",
+   "old": "onclick=\"setZoom(${z})\"",
+   "new": "onclick=\"setZoom(${z + 50})\""
+  },
+  {
+   "name": "P4 Stufe 500 % statt 400 %",
+   "file": "js/06-passung.js",
+   "old": "const ZOOM_PRESETS = [100, 200, 300, 400];",
+   "new": "const ZOOM_PRESETS = [100, 200, 300, 500];"
   }
  ]
 }

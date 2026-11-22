@@ -31,7 +31,8 @@ felder: [ ['Gitarrist verpasst den Einsatz', 'Einsatz'], 'Regen im Konzert', { t
 - **Alle Felder sind gleich groß** (quadratisch, unabhängig vom Text). Der Text wird in die Felder eingepasst, nicht umgekehrt.
 - **So viel Text wie möglich, aber lesbar** (`js/06-passung.js`): Die App nimmt den ganzen Text, wenn er ohne Wortbruch mit mindestens
   10 px aufs Feld passt, sonst den Kurztext des Spiels, dann den ganzen Text bis hinunter zu 8 px, dann mit Silbentrennung und zuletzt gekürzt mit „…“.
-- **Zoom nur für das Spielfeld:** Zwei Finger auseinander oder die Tasten − / ＋ über der Karte (100 bis 400 %); die Prozentanzeige setzt auf 100 % zurück.
+- **Zoom nur für das Spielfeld:** Zwei Finger auseinander, die Tasten − / ＋ oder die Stufen-Buttons 100 %, 200 %, 300 % und 400 % (Maximum) über der Karte.
+  Der Button „100 %“ bringt das ganze Spielfeld zurück; links daneben steht der aktuelle Wert, die aktive Stufe ist hervorgehoben.
   Größere Felder zeigen mehr Text und eine größere Schrift. Beim Öffnen eines Spiels steht der Zoom wieder auf 100 %.
 - **Symbole optional:** Settings → „Symbole (Emojis) auf den Feldern“. Aus = Emojis werden von den Feldtexten entfernt, es passt mehr Text.
 

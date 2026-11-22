@@ -89,8 +89,9 @@
 </div>
 <div class="board-banner" id="boardBanner" role="status" style="display:none"></div>
 <div class="zoom-bar">
+<span class="zoom-val" id="zoomVal" aria-live="polite">100 %</span>
 <button type="button" class="zoom-btn" id="zoomOut" onclick="zoomStep(-1)" aria-label="Spielfeld verkleinern">−</button>
-<button type="button" class="zoom-btn zoom-val" id="zoomVal" onclick="setZoom(100)" aria-label="Zoom zurücksetzen">100 %</button>
+<span class="zoom-presets" id="zoomPresets"></span>
 <button type="button" class="zoom-btn" id="zoomIn" onclick="zoomStep(1)" aria-label="Spielfeld vergrößern">＋</button>
 </div>
 <div class="board-scroll" id="boardScroll"><div class="board" id="board"></div></div>

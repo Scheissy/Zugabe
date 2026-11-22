@@ -51,10 +51,13 @@ button { font-family: inherit; color: inherit; }
 .board-title { font-size: 20px; font-weight: 700; }
 .board-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
 .board-banner { background: var(--gold); color: #1b1500; font-weight: 700; text-align: center; padding: 9px 12px; border-radius: var(--radius-sm); margin-bottom: 10px; }
-.zoom-bar { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-bottom: 8px; }
-.zoom-btn { min-width: 40px; height: 34px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 18px; line-height: 1; cursor: pointer; }
+.zoom-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; margin-bottom: 8px; }
+.zoom-presets { display: flex; gap: 6px; }
+.zoom-btn { min-width: 36px; height: 34px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 18px; line-height: 1; cursor: pointer; }
 .zoom-btn:disabled { opacity: 0.4; cursor: default; }
-.zoom-btn.zoom-val { min-width: 64px; font-size: 12px; font-weight: 600; }
+.zoom-val { margin-right: auto; font-size: 12px; font-weight: 600; color: var(--text2); }
+.zoom-btn.zoom-preset { min-width: 46px; font-size: 12px; font-weight: 600; }
+.zoom-btn.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .board-scroll { touch-action: pan-x pan-y; }
 .board-scroll.zoomed { overflow: auto; max-height: 68dvh; border-radius: var(--radius-sm); }
 .board { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; }
