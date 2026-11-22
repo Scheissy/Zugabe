@@ -3,7 +3,7 @@
 //   id           eindeutig, nur a-z, 0-9 und "-" (wird im Speicherstand als Schlüssel benutzt)
 //   titel        Anzeigename
 //   beschreibung ein kurzer Satz für die Spieleliste (optional)
-//   groesse      3, 4 oder 5 (Karte ist groesse × groesse)
+//   groesse      3, 4, 5, 7 oder 9 (Karte ist groesse × groesse)
 //   freiMitte    true = mittleres Feld ist ein Freifeld (nur bei ungerader Größe sinnvoll)
 //   ziel         'linie' (eine volle Reihe/Spalte/Diagonale gewinnt) oder 'vollbild' (alle Felder)
 //   felder       Liste aller möglichen Felder; es dürfen MEHR sein als auf die Karte passen,
@@ -16,9 +16,21 @@
 //                nach jedem ausgefüllten Feld erscheint ein neues); sie zählen wie abgehakte Punkte.
 //                eigeneHinweis ist der Platzhaltertext im Eingabefeld. Mit eigene: true darf punkte auch
 //                weniger als 2 Einträge haben, und ab darf bis punkte + 10 gehen.
+//                Kurztexte für große Karten: Ein Feld darf als Paar [text, kurztext] stehen (bei Kombi-Feldern
+//                kurz: '…'). Auf dem Feld steht dann der Kurztext (empfohlen bis 20 Zeichen), der ganze Text
+//                erscheint beim Antippen in der Lupe unter der Karte.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 4;
+const BINGO_DATA_VERSION = 5;
+
+// Dummydaten für die Testkarte 9×9: 9 Akteure × 9 Ereignisse = 81 verschiedene Felder mit Kurztext.
+const DUMMY_FELDER = (() => {
+  const wer = [['Sänger', '🎤'], ['Gitarrist', '🎸'], ['Drummer', '🥁'], ['Publikum', '🙌'], ['Security', '🦺'], ['Headliner', '⭐'], ['Vorband', '🎶'], ['Technik', '🎛️'], ['Bassistin', '🎵']];
+  const was = [['verpasst den Einsatz', 'Einsatz'], ['tanzt auf der Bühne', 'tanzt'], ['trinkt Wasser', 'trinkt'], ['wechselt das Instrument', 'Wechsel'], ['spricht Deutsch', 'Deutsch'], ['hat Geburtstag', 'Geburtstag'], ['trägt Sonnenbrille', 'Brille'], ['bedankt sich', 'Danke'], ['verspricht eine Zugabe', 'Zugabe']];
+  const out = [];
+  for (let i = 0; i < 81; i++) { const k = (i * 37) % 81, w = wer[k % 9], e = was[Math.floor(k / 9)]; out.push([w[0] + ' ' + e[0], w[1] + ' ' + e[1]]); }
+  return out;
+})();
 const BINGO_GAMES = [
   {
     id: 'festival',
@@ -65,6 +77,38 @@ const BINGO_GAMES = [
       'Enge Garderobe', 'Barkeeper kennt dich', 'Zu laute Vorband', 'Lieblingssong gespielt',
       'Letzte Bahn knapp erwischt', 'Tropfende Decke', 'Tanzfläche voll'
     ]
+  },
+  {
+    id: 'festivalwoche',
+    titel: 'Festival-Woche',
+    beschreibung: '7×7 mit Kurztexten – der ganze Text steht in der Lupe',
+    groesse: 7, freiMitte: true, ziel: 'linie',
+    felder: [
+      ['Open Air Location', 'Open Air'], ['5 Tage Konzerte am Stück', '5 Tage'], ['Künstler hat den Text vergessen', 'Text vergessen'],
+      ['Regen im Konzert', 'Regen'], ['Schlamm bis zu den Knöcheln', 'Schlamm'], ['Dixi-Schlange', 'Dixi'], ['Bändchen am Handgelenk', 'Bändchen'],
+      ['Headliner kommt zu spät', 'Verspätung'], ['Zugabe-Rufe', 'Zugabe'], ['Pfandbecher-Schlange', 'Pfand'], ['Sonnenbrand', 'Sonnenbrand'],
+      ['Gummistiefel', 'Gummistiefel'], ['Crowdsurfer', 'Crowdsurfer'], ['Wall of Death', 'Wall of Death'], ['Schlechter Ton beim ersten Lied', 'Ton schlecht'],
+      ['Jemand sitzt auf den Schultern', 'Schultern'], ['Merch-Schlange', 'Merch'], ['Kein Handyempfang', 'Kein Netz'], ['Powerbank leer', 'Powerbank'],
+      ['Überraschungsgast', 'Gast'], ['Pyro auf der Bühne', 'Pyro'], ['Zwei Bühnen überschneiden sich', 'Überschneidung'], ['Lieblingslied verpasst', 'Lied verpasst'],
+      ['Frühstück um 14 Uhr', 'Frühstück'], ['Wasserstation leer', 'Wasser leer'], ['Shuttle-Bus überfüllt', 'Shuttle voll'], ['Einlass-Schlange', 'Einlass'],
+      ['Tanzende Security', 'Security'], ['Ohrenstöpsel vergessen', 'Ohrstöpsel'], ['Band bedankt sich beim Team', 'Dank ans Team'],
+      ['Gitarrist wirft Plektrum ins Publikum', 'Plektrum'], ['Sänger stellt eine Mitmach-Frage', 'Mitmach-Frage'], ['Konfettikanone', 'Konfetti'],
+      ['Luftballons im Publikum', 'Luftballons'], ['Jemand hat ein Banner dabei', 'Banner'], ['Stimme nach dem dritten Lied heiser', 'Heiser'],
+      ['Lichtshow im Takt', 'Lichtshow'], ['Drummer wirft einen Stick', 'Drumstick'], ['Mitsing-Spiel mit dem Publikum', 'Mitsingen'],
+      ['Akustik-Set auf der Bühne', 'Akustik'], ['Cover-Song als Überraschung', 'Cover'], ['Band spielt das neue Album', 'Neues Album'],
+      ['Spontane Geburtstagsansage', 'Geburtstag'], ['Jemand ruft nach dem Hit', 'Hit-Ruf'], ['Handy-Taschenlampen leuchten', 'Taschenlampen'],
+      ['Staub und Hitze vor der Bühne', 'Staub'], ['Wellenbrecher komplett voll', 'Wellenbrecher'], ['Foodtruck mit langer Schlange', 'Foodtruck'],
+      ['Zeltplatz-Nachbar mit Gitarre', 'Zeltplatz'], ['Gewitterwarnung wird durchgesagt', 'Gewitter'], ['Programm verspätet sich um eine Stunde', 'Zeitplan'],
+      { text: 'Sprachen, in denen gesungen wird', kurz: 'Sprachen', ab: 3, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Italienisch'], eigene: true, eigeneHinweis: 'Weitere Sprache' },
+      { text: 'Wetter erlebt', kurz: 'Wetter', ab: 3, punkte: ['Sonne', 'Regen', 'Wind', 'Gewitter', 'Nebel', 'Hitze', 'Kälte'] }
+    ]
+  },
+  {
+    id: 'testkarte9',
+    titel: 'Testkarte 9×9 (Dummydaten)',
+    beschreibung: '81 Felder zum Ausprobieren der Lesbarkeit',
+    groesse: 9, freiMitte: true, ziel: 'linie',
+    felder: DUMMY_FELDER
   },
   {
     id: 'marathon',

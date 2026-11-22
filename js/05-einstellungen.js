@@ -6,12 +6,21 @@
 function applySettingsUI() {
   document.getElementById('settingConfirmNewCard').checked = appState.settings.confirmNewCard;
   document.getElementById('settingShowCounter').checked = appState.settings.showCounter;
+  document.getElementById('settingUseKurz').checked = appState.settings.useKurz;
+  document.getElementById('settingLupe').value = appState.settings.lupe;
 }
 function toggleSetting(key, value) {
-  if (!(key in DEFAULT_SETTINGS)) return;
+  if (typeof DEFAULT_SETTINGS[key] !== 'boolean') return;   // nur Ein/Aus-Einstellungen
   appState.settings[key] = !!value;
   saveToStorage();
   renderSpiele();
+  renderBoard();
+}
+
+function setLupeMode(value) {
+  if (!LUPE_MODES.includes(value)) return;
+  appState.settings.lupe = value;
+  saveToStorage();
   renderBoard();
 }
 

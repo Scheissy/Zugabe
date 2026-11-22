@@ -89,6 +89,7 @@
 </div>
 <div class="board-banner" id="boardBanner" role="status" style="display:none"></div>
 <div class="board" id="board"></div>
+<div class="lupe" id="lupe" role="status" aria-live="polite" style="display:none"></div>
 <div class="board-actions">
 <button type="button" class="prog-quick-btn" id="btnResetMarks" onclick="askResetMarks()">Markierungen löschen</button>
 <button type="button" class="prog-quick-btn" id="btnNewCard" onclick="askNewCard()">Neue Karte</button>
@@ -115,6 +116,20 @@
 </div>
 <input type="checkbox" id="settingShowCounter" checked onchange="toggleSetting('showCounter', this.checked)">
 </label>
+<label class="settings-toggle-row">
+<div class="settings-toggle-text">
+<div class="settings-toggle-label">Kurztexte auf den Feldern</div>
+<div class="settings-toggle-desc">Wo ein Spiel Kurztexte hat, steht auf dem Feld der kurze Text statt des ganzen; aus = immer der ganze Text</div>
+</div>
+<input type="checkbox" id="settingUseKurz" checked onchange="toggleSetting('useKurz', this.checked)">
+</label>
+<div class="settings-toggle-row">
+<div class="settings-toggle-text">
+<div class="settings-toggle-label">Lupe unter der Karte</div>
+<div class="settings-toggle-desc">Zeigt den ganzen Text des zuletzt angetippten Felds. „Automatisch“: bei Karten mit Kurztexten und ab 7×7</div>
+</div>
+<select id="settingLupe" onchange="setLupeMode(this.value)"><option value="auto">Automatisch</option><option value="immer">Immer</option><option value="aus">Aus</option></select>
+</div>
 </div>
 <div class="io-section">
 <div class="io-section-title">App installieren</div>

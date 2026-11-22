@@ -20,7 +20,7 @@ const { loadApp, reloadWithState, createChecker } = require('./test-helpers');
   for (const [name, raw] of [['kein JSON', '{{{'], ['null', 'null'], ['Zahl', '42'], ['leeres Objekt', '{}']]) {
     const c = await loadApp({ storage: raw, trackErrors: true });
     t.check(`Speicherstand "${name}": App startet, Spieleliste ist da, Standardeinstellungen.`,
-      c.document.querySelectorAll('.game-card').length === 4 && c.window.eval('appState.settings.confirmNewCard') === true && c.window.eval('appState.activeGame') === '' && c.errors.length === 0, c.errors);
+      c.document.querySelectorAll('.game-card').length === c.window.eval('allGames.length') && c.window.eval('appState.settings.confirmNewCard') === true && c.window.eval('appState.activeGame') === '' && c.errors.length === 0, c.errors);
   }
   const bad = await loadApp({ storage: JSON.stringify({ settings: { confirmNewCard: 'ja', showCounter: 0 }, activeGame: 5, cards: 'x' }) });
   t.check('Falsche Typen bei Einstellungen/activeGame/cards fallen auf Standardwerte zurück.', bad.window.eval('appState.settings.confirmNewCard') === true && bad.window.eval('appState.settings.showCounter') === true && bad.window.eval('appState.activeGame') === '' && Object.keys(bad.window.eval('appState.cards')).length === 0);

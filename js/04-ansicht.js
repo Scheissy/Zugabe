@@ -83,6 +83,7 @@ function renderSpiele() {
 }
 function openGame(id) {
   if (!startGame(id)) return;
+  lupePos = -1;
   switchTab('spiel');
 }
 
@@ -92,7 +93,7 @@ function renderBoard() {
   const card = game && appState.cards[game.id];
   document.getElementById('boardEmpty').style.display = card ? 'none' : '';
   document.getElementById('boardContent').style.display = card ? '' : 'none';
-  if (!card) return;
+  if (!card) { renderLupe(); return; }
   const n = game.groesse;
   const win = new Set();
   if (game.ziel === 'linie') winningLines(card, n).forEach(line => line.forEach(p => win.add(p)));
@@ -108,22 +109,50 @@ function renderBoard() {
   }
   const board = document.getElementById('board');
   board.style.setProperty('--n', n);
+  board.classList.toggle('big', n >= 7);
   board.innerHTML = card.cells.map((c, p) => {
     const w = win.has(p) ? ' win' : '';
     if (c === null) return `<div class="cell n${n} free marked${w}" data-p="${p}">Frei</div>`;
     if (isComboEntry(c)) {
       const k = comboCount(card, p);
-      return `<button type="button" class="cell n${n} combo${isMarked(card, p) ? ' marked' : ''}${w}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${k} von ${c.ab} Häkchen" onclick="openCombo(${p})"><span class="cell-text">${esc(c.t)}</span><span class="cell-progress">☑ ${k}/${c.ab}</span></button>`;
+      const lab = appState.settings.useKurz && kurzOf(game, c.t) || c.t;
+      return `<button type="button" class="cell n${n} combo${lab !== c.t ? ' kurz' : ''}${isMarked(card, p) ? ' marked' : ''}${w}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${k} von ${c.ab} Häkchen" title="${esc(c.t)}" onclick="openCombo(${p})"><span class="cell-text">${esc(lab)}</span><span class="cell-progress">☑ ${k}/${c.ab}</span></button>`;
     }
     const m = card.marks.includes(p);
-    return `<button type="button" class="cell n${n}${m ? ' marked' : ''}${w}" data-p="${p}" aria-pressed="${m}" onclick="onCell(${p})">${esc(c)}</button>`;
+    const lab = appState.settings.useKurz && kurzOf(game, c) || c;
+    const full = lab !== c ? ` aria-label="${esc(c)}" title="${esc(c)}"` : '';
+    return `<button type="button" class="cell n${n}${lab !== c ? ' kurz' : ''}${m ? ' marked' : ''}${w}" data-p="${p}"${full} aria-pressed="${m}" onclick="onCell(${p})">${esc(lab)}</button>`;
   }).join('');
+  renderLupe();
 }
 function onCell(p) {
+  lupePos = p;
   const r = toggleMark(appState.activeGame, p);
-  if (!r.changed) return;
+  if (!r.changed) { renderLupe(); return; }
   renderBoard();
   if (r.justWon) showToast('Bingo!');
+}
+
+// ── LUPE: ganzer Text des zuletzt angetippten Felds unter der Karte ───────────
+let lupePos = -1;
+function lupeActive(game) {
+  const mode = appState.settings.lupe;
+  if (mode === 'immer') return true;
+  if (mode === 'aus') return false;
+  return game.groesse >= 7 || Object.keys(game.kurz || {}).length > 0;
+}
+function renderLupe() {
+  const el = document.getElementById('lupe');
+  const game = gameById(appState.activeGame);
+  const card = game && appState.cards[game.id];
+  const on = !!card && lupeActive(game);
+  el.style.display = on ? '' : 'none';
+  if (!on) return;
+  const c = lupePos >= 0 ? card.cells[lupePos] : null;
+  if (c === null || c === undefined) { el.innerHTML = '<small>Tippe ein Feld an, um den ganzen Text hier zu lesen.</small>'; return; }
+  const full = isComboEntry(c) ? c.t : c;
+  const meta = isComboEntry(c) ? `☑ ${comboCount(card, lupePos)}/${c.ab}` : (card.marks.includes(lupePos) ? 'markiert' : 'nicht markiert');
+  el.innerHTML = `<span class="lupe-text">${esc(full)}</span><small>${esc(meta)}</small>`;
 }
 
 // ── KOMBI-FELDER: Checkliste im Dialog ───────────────────────────────────────
@@ -138,6 +167,8 @@ function openCombo(p) {
   const c = card && card.cells[p];
   if (!isComboEntry(c)) return;
   comboPos = p;
+  lupePos = p;
+  renderLupe();
   const checked = card.checks[p] || [];
   document.getElementById('comboTitle').textContent = c.t;
   document.getElementById('comboList').innerHTML = c.p.map((name, i) =>
@@ -225,7 +256,7 @@ function hasMarks() {
 }
 function askNewCard() {
   const id = appState.activeGame;
-  const run = () => { newCardFor(id); renderBoard(); showToast('Neue Karte'); };
+  const run = () => { newCardFor(id); lupePos = -1; renderBoard(); showToast('Neue Karte'); };
   if (appState.settings.confirmNewCard && hasMarks()) askConfirm('Neue Karte?', 'Die aktuelle Karte mit ihren Markierungen wird ersetzt.', 'Neue Karte', run);
   else run();
 }

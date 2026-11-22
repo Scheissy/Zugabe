@@ -11,6 +11,23 @@ Die App prüft die Daten beim Start (Settings → Datenqualität); Spiele mit Fe
 Danach `BINGO_DATA_VERSION` erhöhen und – damit Handys die neue Version sicher holen – `CACHE` in `sw.js` hochzählen
 (`zugabe-v1` → `zugabe-v2`).
 
+## Große Karten, Kurztexte und Lupe
+
+Kartengrößen: 3×3, 4×4, 5×5, 7×7 und 9×9 (`groesse`). Auf großen Karten passt der ganze Text oft nicht mehr auf ein Feld.
+Dafür gibt es zwei Hilfen:
+
+- **Kurztexte:** Ein Feld darf als Paar `[text, kurztext]` stehen, ein Kombi-Feld mit `kurz: '…'`. Auf dem Feld steht dann der
+  Kurztext (empfohlen bis 20 Zeichen, mit größerer Schrift), der ganze Text steht im `aria-label` und im Tooltip.
+- **Lupe:** Unter der Karte steht der ganze Text des zuletzt angetippten Felds (bei Kombi-Feldern mit Fortschritt).
+  Antippen markiert das Feld wie bisher. Settings → „Lupe unter der Karte“: Automatisch (bei Karten mit Kurztexten und ab 7×7),
+  Immer oder Aus. Settings → „Kurztexte auf den Feldern“ schaltet die Kurztexte ab, dann zeigt jedes Feld den ganzen Text.
+
+```js
+felder: [ ['Gitarrist verpasst den Einsatz', 'Einsatz'], 'Regen im Konzert', { text: 'Wetter erlebt', kurz: 'Wetter', ab: 3, punkte: [ … ] } ]
+```
+
+Mitgeliefert: „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
+
 ## Kombi-Felder
 
 Ein Eintrag in `felder` kann statt eines Textes ein Kombi-Feld sein: ein Feld mit Einzelpunkten als Checkliste,

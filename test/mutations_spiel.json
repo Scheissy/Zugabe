@@ -5,7 +5,8 @@
   "test/test_storage.js",
   "test/test_validation.js",
   "test/test_kombi.js",
-  "test/test_kombi_eigene.js"
+  "test/test_kombi_eigene.js",
+  "test/test_lupe.js"
  ],
  "mutations": [
   {
@@ -187,6 +188,54 @@
    "file": "js/04-ansicht.js",
    "old": "input.placeholder = (cur && cur.c.h) || 'Weiteren Punkt eintragen';",
    "new": "input.placeholder = 'Weiteren Punkt eintragen';"
+  },
+  {
+   "name": "L1 Kurztexte werden ignoriert",
+   "file": "js/01-data.js",
+   "old": "return typeof k === 'string' ? k : '';",
+   "new": "return '';"
+  },
+  {
+   "name": "L2 Lupen-Text nicht maskiert",
+   "file": "js/04-ansicht.js",
+   "old": "<span class=\"lupe-text\">${esc(full)}</span>",
+   "new": "<span class=\"lupe-text\">${full}</span>"
+  },
+  {
+   "name": "L3 aria-label/Tooltip nicht maskiert",
+   "file": "js/04-ansicht.js",
+   "old": "const full = lab !== c ? ` aria-label=\"${esc(c)}\" title=\"${esc(c)}\"` : '';",
+   "new": "const full = lab !== c ? ` aria-label=\"${c}\" title=\"${c}\"` : '';"
+  },
+  {
+   "name": "L4 Lupe automatisch nur bei Kurztexten (nicht ab 7×7)",
+   "file": "js/04-ansicht.js",
+   "old": "return game.groesse >= 7 || Object.keys(game.kurz || {}).length > 0;",
+   "new": "return Object.keys(game.kurz || {}).length > 0;"
+  },
+  {
+   "name": "L5 Kartengröße 6 erlaubt",
+   "file": "js/01-data.js",
+   "old": "const GROESSEN = [3, 4, 5, 7, 9];",
+   "new": "const GROESSEN = [3, 4, 5, 6, 7, 9];"
+  },
+  {
+   "name": "L6 Einstellung 'Kurztexte' wirkungslos",
+   "file": "js/04-ansicht.js",
+   "old": "const lab = appState.settings.useKurz && kurzOf(game, c) || c;",
+   "new": "const lab = kurzOf(game, c) || c;"
+  },
+  {
+   "name": "L7 Neue Karte lässt die Lupe stehen",
+   "file": "js/04-ansicht.js",
+   "old": "newCardFor(id); lupePos = -1; renderBoard();",
+   "new": "newCardFor(id); renderBoard();"
+  },
+  {
+   "name": "L8 Ungültiger Lupen-Modus wird übernommen",
+   "file": "js/05-einstellungen.js",
+   "old": "  if (!LUPE_MODES.includes(value)) return;\n",
+   "new": ""
   }
  ]
 }

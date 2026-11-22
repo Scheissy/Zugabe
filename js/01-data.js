@@ -3,7 +3,8 @@
 (window.BINGO_PARTS = window.BINGO_PARTS || []).push('01-data');
 
 const LS_KEY = 'zugabe-v1';
-const GROESSEN = [3, 4, 5];
+const GROESSEN = [3, 4, 5, 7, 9];
+const MAX_KURZ = 20;          // empfohlene Höchstlänge eines Kurztextes auf dem Feld
 const ZIELE = ['linie', 'vollbild'];
 const MAX_FELD_LEN = 80;
 
@@ -75,6 +76,7 @@ function comboProblems(f) {
 // Prüft alle Spiele. Rückgabe: Liste von { id, level: 'fehler' | 'hinweis', text }.
 // Spiele mit mindestens einem 'fehler' sind nicht spielbar (siehe playableGames).
 function validateGames(list) {
+  list = normalizeGames(list);
   const issues = [];
   const seen = new Set();
   const add = (id, level, text) => issues.push({ id: id, level: level, text: text });
@@ -85,7 +87,7 @@ function validateGames(list) {
     else if (seen.has(g.id)) add(id, 'fehler', 'id kommt mehrfach vor');
     else seen.add(g.id);
     if (typeof g.titel !== 'string' || !g.titel.trim()) add(id, 'fehler', 'titel fehlt');
-    if (!GROESSEN.includes(g.groesse)) add(id, 'fehler', 'groesse muss 3, 4 oder 5 sein');
+    if (!GROESSEN.includes(g.groesse)) add(id, 'fehler', 'groesse muss 3, 4, 5, 7 oder 9 sein');
     if (!ZIELE.includes(g.ziel)) add(id, 'fehler', "ziel muss 'linie' oder 'vollbild' sein");
     if (!Array.isArray(g.felder) || g.felder.some(f => !(typeof f === 'string' ? f.trim() : isComboEntry(f)))) {
       add(id, 'fehler', 'felder muss eine Liste aus nicht-leeren Texten oder Kombi-Feldern sein');
@@ -95,6 +97,7 @@ function validateGames(list) {
     const norm = g.felder.map(f => String(feldText(f)).trim().toLowerCase());
     const dups = norm.filter((f, k) => norm.indexOf(f) !== k);
     if (dups.length) add(id, 'fehler', 'doppelte Felder: ' + [...new Set(dups)].join(', '));
+    if (Object.keys(g.kurz || {}).some(k => String(g.kurz[k]).length > MAX_KURZ)) add(id, 'hinweis', 'Kurztext länger als ' + MAX_KURZ + ' Zeichen (passt schlecht auf ein Feld)');
     const tooLong = x => typeof x === 'string' && x.length > MAX_FELD_LEN;
     if (g.felder.some(f => tooLong(feldText(f)) || (isComboEntry(f) && Array.isArray(f.punkte) && f.punkte.some(tooLong)))) {
       add(id, 'hinweis', 'Feldtext länger als ' + MAX_FELD_LEN + ' Zeichen (wird gekürzt gespeichert)');
@@ -108,7 +111,30 @@ function validateGames(list) {
   return issues;
 }
 
-const allGames = typeof BINGO_GAMES !== 'undefined' ? BINGO_GAMES : [];
+// Kurztexte: Ein Feld darf in den Daten als Paar [Text, Kurztext] stehen, ein Kombi-Feld mit kurz: '…'.
+// Die Normalisierung macht daraus normale Felder und legt die Kurztexte in game.kurz[Text] ab - alles
+// Weitere (Karten, Speicher) arbeitet unverändert mit dem vollen Text. Ungültige Paare bleiben stehen und
+// werden von validateGames als Fehler gemeldet. Mehrfaches Aufrufen ändert nichts.
+function normalizeGames(list) {
+  if (!Array.isArray(list)) return [];
+  return list.map(g => {
+    if (!g || typeof g !== 'object' || !Array.isArray(g.felder)) return g;
+    const kurz = Object.assign({}, g.kurz && typeof g.kurz === 'object' && !Array.isArray(g.kurz) ? g.kurz : {});
+    const ok = x => typeof x === 'string' && x.trim();
+    const felder = g.felder.map(f => {
+      if (Array.isArray(f) && f.length === 2 && ok(f[0]) && ok(f[1])) { kurz[f[0]] = f[1].trim(); return f[0]; }
+      if (isComboEntry(f) && ok(f.text) && ok(f.kurz)) kurz[f.text] = f.kurz.trim();
+      return f;
+    });
+    return Object.assign({}, g, { felder: felder, kurz: kurz });
+  });
+}
+function kurzOf(game, text) {
+  const k = game && game.kurz && game.kurz[text];
+  return typeof k === 'string' ? k : '';
+}
+
+const allGames = normalizeGames(typeof BINGO_GAMES !== 'undefined' ? BINGO_GAMES : []);
 let lastValidationIssues = [];
 function playableGames() {
   lastValidationIssues = validateGames(allGames);

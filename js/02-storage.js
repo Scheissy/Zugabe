@@ -2,7 +2,9 @@
 // Teil der App: klassisches Skript im gemeinsamen globalen Bereich (Ladereihenfolge siehe index.html).
 (window.BINGO_PARTS = window.BINGO_PARTS || []).push('02-storage');
 
-const DEFAULT_SETTINGS = { confirmNewCard: true, showCounter: true };
+// lupe: 'auto' (bei Karten mit Kurztexten und ab 7×7), 'immer' oder 'aus'; useKurz: Kurztexte auf den Feldern zeigen
+const LUPE_MODES = ['auto', 'immer', 'aus'];
+const DEFAULT_SETTINGS = { confirmNewCard: true, showCounter: true, useKurz: true, lupe: 'auto' };
 // cards[gameId] = { seed, cells: [Text | Kombi-Feld { t, p, ab } | null (Freifeld)], marks: [Positionen von Textfeldern],
 //                    checks: { Position: [Nummern der abgehakten Punkte] },
 //                    eigene: { Position: [selbst eingetragene Texte] } (nur Kombi-Felder mit e: true) }
@@ -94,7 +96,9 @@ function loadFromStorage() {
     const s = data.settings && typeof data.settings === 'object' ? data.settings : {};
     appState.settings = {
       confirmNewCard: typeof s.confirmNewCard === 'boolean' ? s.confirmNewCard : DEFAULT_SETTINGS.confirmNewCard,
-      showCounter: typeof s.showCounter === 'boolean' ? s.showCounter : DEFAULT_SETTINGS.showCounter
+      showCounter: typeof s.showCounter === 'boolean' ? s.showCounter : DEFAULT_SETTINGS.showCounter,
+      useKurz: typeof s.useKurz === 'boolean' ? s.useKurz : DEFAULT_SETTINGS.useKurz,
+      lupe: LUPE_MODES.includes(s.lupe) ? s.lupe : DEFAULT_SETTINGS.lupe
     };
     appState.activeGame = typeof data.activeGame === 'string' && games.some(g => g.id === data.activeGame) ? data.activeGame : '';
   } catch (e) { safeLog('Load error', e); }
