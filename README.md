@@ -34,6 +34,8 @@ felder: [ ['Gitarrist verpasst den Einsatz', 'Einsatz'], 'Regen im Konzert', { t
 - **Zoom nur für das Spielfeld:** Zwei Finger auseinander, die Tasten − / ＋ oder die Stufen-Buttons 100 %, 200 %, 300 % und 400 % (Maximum) über der Karte.
   Der Button „100 %“ bringt das ganze Spielfeld zurück; links daneben steht der aktuelle Wert, die aktive Stufe ist hervorgehoben.
   Größere Felder zeigen mehr Text und eine größere Schrift. Beim Öffnen eines Spiels steht der Zoom wieder auf 100 %.
+  Der Rahmen um das Spielfeld behält beim Zoomen genau seine Größe (quadratisch wie bei 100 %): nur sein Inhalt wird größer und lässt sich darin verschieben,
+  alles außerhalb (Titel, Lupe, Datum und Info, Buttons) bleibt an derselben Stelle.
 - **Symbole optional:** Settings → „Symbole (Emojis) auf den Feldern“. Aus = Emojis werden von den Feldtexten entfernt, es passt mehr Text.
 
 ### Datum und Info zu einem Feld

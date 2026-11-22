@@ -412,6 +412,24 @@
    "file": "js/07-details.js",
    "old": "Math.hypot(e.clientX - sx, e.clientY - sy) > 10",
    "new": "Math.hypot(e.clientX - sx, e.clientY - sy) > 1000"
+  },
+  {
+   "name": "Z1 Rahmen wächst mit dem Zoom (max-height statt quadratisch)",
+   "file": "css/app.css",
+   "old": "overflow: auto; aspect-ratio: 1 / 1; overscroll-behavior: contain;",
+   "new": "overflow: auto; max-height: 68dvh; overscroll-behavior: contain;"
+  },
+  {
+   "name": "Z2 Wischen im Spielfeld scrollt die Seite mit",
+   "file": "css/app.css",
+   "old": "aspect-ratio: 1 / 1; overscroll-behavior: contain;",
+   "new": "aspect-ratio: 1 / 1;"
+  },
+  {
+   "name": "Z3 Spielfeld mit ungleichem Zeilen-/Spaltenabstand",
+   "file": "css/app.css",
+   "old": "minmax(0, 1fr)); gap: 6px; }",
+   "new": "minmax(0, 1fr)); gap: 6px; row-gap: 9px; }"
   }
  ]
 }

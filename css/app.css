@@ -59,7 +59,9 @@ button { font-family: inherit; color: inherit; }
 .zoom-btn.zoom-preset { min-width: 46px; font-size: 12px; font-weight: 600; }
 .zoom-btn.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .board-scroll { touch-action: pan-x pan-y; }
-.board-scroll.zoomed { overflow: auto; max-height: 68dvh; border-radius: var(--radius-sm); }
+/* Beim Zoomen behält der Rahmen genau die Größe des Spielfelds bei 100 % (quadratisch): nur sein Inhalt wird größer,
+   alles darum herum (Lupe, Buttons, Texte) bleibt an derselben Stelle. */
+.board-scroll.zoomed { overflow: auto; aspect-ratio: 1 / 1; overscroll-behavior: contain; border-radius: var(--radius-sm); }
 .board { --n: 5; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; }
 .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; cursor: pointer; user-select: none; min-width: 0; min-height: 0; overflow: hidden; }
 .cell.fit { white-space: pre; overflow-wrap: normal; hyphens: manual; }

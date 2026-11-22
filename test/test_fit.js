@@ -17,7 +17,10 @@ const { ROOT, loadApp, reloadWithState, createChecker, createHelpers } = require
   t.check('.cell: quadratisch (aspect-ratio 1) und unabhängig vom Inhalt (min-height 0, overflow hidden) - sonst wachsen Zeilen bei langem Text.',
     /aspect-ratio:\s*1/.test(rule('.cell')) && /min-height:\s*0/.test(rule('.cell')) && /min-width:\s*0/.test(rule('.cell')) && /overflow:\s*hidden/.test(rule('.cell')), rule('.cell'));
   t.check('.cell.fit: Zeilenumbrüche kommen aus der Berechnung (white-space: pre, keine automatische Silbentrennung).', /white-space:\s*pre/.test(rule('.cell.fit')) && /hyphens:\s*manual/.test(rule('.cell.fit')));
-  t.check('Gezoomtes Spielfeld scrollt im eigenen Rahmen mit begrenzter Höhe.', /overflow:\s*auto/.test(rule('.board-scroll.zoomed')) && /max-height/.test(rule('.board-scroll.zoomed')));
+  t.check('Gezoomtes Spielfeld scrollt im eigenen Rahmen, der quadratisch bleibt wie das Spielfeld bei 100 % (aspect-ratio 1) und nicht mit dem Zoom wächst (keine max-height/height).',
+    /overflow:\s*auto/.test(rule('.board-scroll.zoomed')) && /aspect-ratio:\s*1\s*\/\s*1/.test(rule('.board-scroll.zoomed')) && !/(max-height|[^-]height)\s*:/.test(rule('.board-scroll.zoomed')), rule('.board-scroll.zoomed'));
+  t.check('Wischen auf dem gezoomten Spielfeld scrollt nicht die Seite mit (overscroll-behavior: contain).', /overscroll-behavior:\s*contain/.test(rule('.board-scroll.zoomed')));
+  t.check('Das Spielfeld ist bei 100 % so hoch wie breit (quadratische Felder, ein gemeinsamer Abstand für Zeilen und Spalten): der Rahmen im Zoom hat damit dieselbe Größe.', /aspect-ratio:\s*1/.test(rule('.cell')) && /grid-template-columns:\s*repeat\(var\(--n\)/.test(rule('.board')) && /(^|[\s;])gap:\s*\d+px/.test(rule('.board')) && !/(row|column)-gap/.test(rule('.board') + rule('.board.big')));
 
   // ───────── 2) Symbole ─────────
   t.check('stripIcons entfernt Emojis samt Variantenselektor und räumt Leerzeichen auf.', w.stripIcons('🎸 Einsatz') === 'Einsatz' && w.stripIcons('⭐ Danke 🎛️') === 'Danke' && w.stripIcons('A  B') === 'A B');
