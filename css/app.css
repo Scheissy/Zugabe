@@ -66,6 +66,8 @@ button { font-family: inherit; color: inherit; }
 .cell.n5 { font-size: 11px; }
 .cell.n4 { font-size: 13px; }
 .cell.n3 { font-size: 15px; }
+.cell { position: relative; }
+.cell.info::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35); }
 .cell.n7 { font-size: 9.5px; padding: 2px; }
 .cell.n9 { font-size: 8px; padding: 1px; }
 .cell.kurz.n3 { font-size: 16px; }
@@ -78,6 +80,16 @@ button { font-family: inherit; color: inherit; }
 .lupe { margin-top: 10px; min-height: 58px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
 .lupe-text { display: block; font-size: 17px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
 .lupe small { display: block; font-size: 11px; color: var(--text2); margin-top: 3px; }
+.lupe-detail { display: block; font-size: 13px; font-weight: 600; margin-top: 6px; }
+.lupe-info { display: block; font-size: 14px; line-height: 1.4; margin-top: 4px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.lupe-edit { margin-top: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 12px; font-size: 13px; cursor: pointer; }
+.detail-label { font-size: 12px; font-weight: 700; color: var(--text2); margin-top: 4px; }
+.detail-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font: inherit; font-size: 15px; padding: 10px 12px; }
+textarea.detail-input { resize: vertical; min-height: 76px; }
+.detail-input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.detail-date-row { display: flex; gap: 6px; align-items: center; }
+.detail-date-row .detail-input { flex: 1; min-width: 0; }
+.detail-hint { font-size: 11px; color: var(--text3); }
 .cell.marked { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .cell.free { cursor: default; font-style: italic; }
 .cell.win { box-shadow: 0 0 0 2px var(--gold) inset; }

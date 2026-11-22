@@ -4,10 +4,11 @@
 
 // lupe: 'auto' (bei Karten mit Kurztexten und ab 7×7), 'immer' oder 'aus'; useKurz: Kurztexte auf den Feldern zeigen
 const LUPE_MODES = ['auto', 'immer', 'aus'];
-const DEFAULT_SETTINGS = { confirmNewCard: true, showCounter: true, useKurz: true, icons: true, lupe: 'auto' };
+const DEFAULT_SETTINGS = { confirmNewCard: true, showCounter: true, useKurz: true, icons: true, autoDatum: true, lupe: 'auto' };
 // cards[gameId] = { seed, cells: [Text | Kombi-Feld { t, p, ab } | null (Freifeld)], marks: [Positionen von Textfeldern],
 //                    checks: { Position: [Nummern der abgehakten Punkte] },
-//                    eigene: { Position: [selbst eingetragene Texte] } (nur Kombi-Felder mit e: true) }
+//                    eigene: { Position: [selbst eingetragene Texte] } (nur Kombi-Felder mit e: true),
+//                    details: { Position: { d: 'JJJJ-MM-TT', i: 'Info' } } (beides optional) }
 // Die Feldtexte werden mitgespeichert: eine laufende Karte bleibt auch dann gleich, wenn bingo-data.js geändert wird.
 let appState = { cards: {}, settings: { ...DEFAULT_SETTINGS }, activeGame: '' };
 let stateVersion = 0;
@@ -63,7 +64,20 @@ function sanitizeCard(game, raw) {
       .map(x => x.trim().slice(0, MAX_EIGENE_LEN).trim()).filter(Boolean).slice(0, MAX_EIGENE);
     if (list.length) eigene[p] = list;
   });
-  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene };
+  // Datum und Info je Feld (optional); Einträge ohne gültiges Datum und ohne Text fallen weg.
+  const details = {};
+  const rdt = raw.details && typeof raw.details === 'object' && !Array.isArray(raw.details) ? raw.details : {};
+  Object.keys(rdt).forEach(k => {
+    const p = Number(k);
+    const e = rdt[k];
+    if (!Number.isInteger(p) || String(p) !== k || p < 0 || p >= total || cells[p] === null || !e || typeof e !== 'object' || Array.isArray(e)) return;
+    const out = {};
+    if (typeof e.d === 'string' && isValidDate(e.d)) out.d = e.d;
+    const info = typeof e.i === 'string' ? e.i.trim().slice(0, MAX_INFO).trim() : '';
+    if (info) out.i = info;
+    if (out.d || out.i) details[p] = out;
+  });
+  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene, details: details };
 }
 
 function saveToStorage() {
@@ -99,6 +113,7 @@ function loadFromStorage() {
       showCounter: typeof s.showCounter === 'boolean' ? s.showCounter : DEFAULT_SETTINGS.showCounter,
       useKurz: typeof s.useKurz === 'boolean' ? s.useKurz : DEFAULT_SETTINGS.useKurz,
       icons: typeof s.icons === 'boolean' ? s.icons : DEFAULT_SETTINGS.icons,
+      autoDatum: typeof s.autoDatum === 'boolean' ? s.autoDatum : DEFAULT_SETTINGS.autoDatum,
       lupe: LUPE_MODES.includes(s.lupe) ? s.lupe : DEFAULT_SETTINGS.lupe
     };
     appState.activeGame = typeof data.activeGame === 'string' && games.some(g => g.id === data.activeGame) ? data.activeGame : '';

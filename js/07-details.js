@@ -1,0 +1,52 @@
+// ── js/07-details.js ── Datum und Info zu einem Feld: Dialog, langes Drücken ──
+// Teil der App: klassisches Skript im gemeinsamen globalen Bereich (Ladereihenfolge siehe index.html).
+(window.BINGO_PARTS = window.BINGO_PARTS || []).push('07-details');
+
+// Dialog: Datum (Datumsfeld, "Heute", "Entfernen") und Info-Text. Alles ist optional und wird sofort gespeichert.
+let detailPos = -1;
+function openDetails(p) {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[p];
+  if (c === null || c === undefined) return;            // Freifeld und ungültige Felder haben keine Details
+  detailPos = p;
+  lupePos = p;
+  const det = detailsOf(card, p) || {};
+  document.getElementById('detailTitle').textContent = isComboEntry(c) ? c.t : c;
+  document.getElementById('detailDate').value = det.d || '';
+  document.getElementById('detailInfo').value = det.i || '';
+  renderLupe();
+  openModal('detailModal');
+}
+function afterDetailChange(r) { if (r.changed) renderBoard(); }   // zeichnet auch die Lupe neu
+function onDetailDate(v) { afterDetailChange(setDetail(appState.activeGame, detailPos, { d: v })); }
+function onDetailInfo(v) { afterDetailChange(setDetail(appState.activeGame, detailPos, { i: v })); }
+function detailToday() {
+  const t = todayStr();
+  document.getElementById('detailDate').value = t;
+  onDetailDate(t);
+}
+function detailClearDate() {
+  document.getElementById('detailDate').value = '';
+  onDetailDate('');
+}
+
+// Langes Drücken auf ein Feld öffnet den Dialog; der anschließende Klick markiert das Feld nicht.
+let LONGPRESS_MS = 550;
+(function initLongPress() {
+  const board = document.getElementById('board');
+  if (!board) return;
+  let timer = 0, fired = false, sx = 0, sy = 0;
+  const cancel = () => { clearTimeout(timer); timer = 0; };
+  board.addEventListener('pointerdown', e => {
+    fired = false;
+    cancel();
+    const cell = e.target.closest && e.target.closest('.cell');
+    if (!cell || cell.classList.contains('free') || e.isPrimary === false) return;
+    sx = e.clientX; sy = e.clientY;
+    timer = setTimeout(() => { timer = 0; fired = true; openDetails(+cell.dataset.p); }, LONGPRESS_MS);
+  });
+  board.addEventListener('pointermove', e => { if (timer && Math.hypot(e.clientX - sx, e.clientY - sy) > 10) cancel(); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => board.addEventListener(type, cancel));
+  board.addEventListener('click', e => { if (fired) { fired = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+  board.addEventListener('contextmenu', e => e.preventDefault());
+})();

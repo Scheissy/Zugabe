@@ -7,7 +7,8 @@
   "test/test_kombi.js",
   "test/test_kombi_eigene.js",
   "test/test_lupe.js",
-  "test/test_fit.js"
+  "test/test_fit.js",
+  "test/test_details.js"
  ],
  "mutations": [
   {
@@ -181,8 +182,8 @@
   {
    "name": "E9 Rückfrage übersieht reine eigene Einträge",
    "file": "js/04-ansicht.js",
-   "old": " + Object.keys(card.eigene || {}).length > 0",
-   "new": " > 0"
+   "old": " + Object.keys(card.eigene || {}).length",
+   "new": ""
   },
   {
    "name": "E10 Platzhalter aus eigeneHinweis wird ignoriert",
@@ -339,6 +340,78 @@
    "file": "js/06-passung.js",
    "old": "const ZOOM_PRESETS = [100, 200, 300, 400];",
    "new": "const ZOOM_PRESETS = [100, 200, 300, 500];"
+  },
+  {
+   "name": "D1 Eigenes Datum wird beim Markieren überschrieben",
+   "file": "js/03-spiel.js",
+   "old": "if (!cur || !cur.d) {",
+   "new": "if (true) {"
+  },
+  {
+   "name": "D2 Einstellung 'Datum automatisch' wirkungslos",
+   "file": "js/03-spiel.js",
+   "old": " && isMarked(card, p) && appState.settings.autoDatum) {",
+   "new": " && isMarked(card, p)) {"
+  },
+  {
+   "name": "D3 Datumsprüfung ohne Kalender",
+   "file": "js/01-data.js",
+   "old": "return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === da;",
+   "new": "return true;"
+  },
+  {
+   "name": "D4 Info wird nicht getrimmt/gekürzt",
+   "file": "js/03-spiel.js",
+   "old": "patch.i.trim().slice(0, MAX_INFO).trim()",
+   "new": "patch.i"
+  },
+  {
+   "name": "D5 Zurücksetzen lässt Datum und Info stehen",
+   "file": "js/03-spiel.js",
+   "old": "  card.eigene = {};\n  card.details = {};\n",
+   "new": "  card.eigene = {};\n"
+  },
+  {
+   "name": "D6 Details am Freifeld bleiben beim Laden",
+   "file": "js/02-storage.js",
+   "old": " || cells[p] === null || !e || typeof e !== 'object' || Array.isArray(e)) return;",
+   "new": " || !e || typeof e !== 'object' || Array.isArray(e)) return;"
+  },
+  {
+   "name": "D7 Klick nach langem Drücken markiert trotzdem",
+   "file": "js/07-details.js",
+   "old": "if (fired) { fired = false; e.stopImmediatePropagation(); e.preventDefault(); }",
+   "new": "if (false) { fired = false; e.stopImmediatePropagation(); e.preventDefault(); }"
+  },
+  {
+   "name": "D8 Rückfrage übersieht reine Details",
+   "file": "js/04-ansicht.js",
+   "old": " + Object.keys(card.details || {}).length",
+   "new": ""
+  },
+  {
+   "name": "D9 Info in der Lupe nicht maskiert",
+   "file": "js/04-ansicht.js",
+   "old": "${esc(det.i)}",
+   "new": "${det.i}"
+  },
+  {
+   "name": "D10 Gespeichertes Datum wird nicht geprüft",
+   "file": "js/02-storage.js",
+   "old": "if (typeof e.d === 'string' && isValidDate(e.d)) out.d = e.d;",
+   "new": "if (typeof e.d === 'string') out.d = e.d;"
+  },
+  {
+   "name": "D11 Hinweispunkt für Info fehlt",
+   "file": "js/04-ansicht.js",
+   "old": "${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}",
+   "new": "${m ? ' marked' : ''}${w}"
+  },
+  {
+   "name": "D12 Wischen bricht langes Drücken nicht ab",
+   "file": "js/07-details.js",
+   "old": "Math.hypot(e.clientX - sx, e.clientY - sy) > 10",
+   "new": "Math.hypot(e.clientX - sx, e.clientY - sy) > 1000"
   }
  ]
 }

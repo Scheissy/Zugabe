@@ -7,6 +7,24 @@ const GROESSEN = [3, 4, 5, 7, 9];
 const MAX_KURZ = 20;          // empfohlene Höchstlänge eines Kurztextes auf dem Feld
 const ZIELE = ['linie', 'vollbild'];
 const MAX_FELD_LEN = 80;
+const MAX_INFO = 200;           // Länge des Info-Texts zu einem Feld
+
+// Datum als "JJJJ-MM-TT" (lokale Zeit) - so speichert auch das Datumsfeld.
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+// Gültiges Kalenderdatum im Format JJJJ-MM-TT (Jahre 1900 bis 2200, Schaltjahre beachtet)?
+function isValidDate(s) {
+  const m = typeof s === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(s) : null;
+  if (!m) return false;
+  const y = +m[1], mo = +m[2], da = +m[3];
+  if (y < 1900 || y > 2200) return false;
+  const dt = new Date(Date.UTC(y, mo - 1, da));
+  return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === da;
+}
+// "2026-11-22" -> "22.11.2026" (leer bei ungültigem Datum)
+function formatDate(s) { return isValidDate(s) ? s.slice(8) + '.' + s.slice(5, 7) + '.' + s.slice(0, 4) : ''; }
 
 // Maskiert Text für innerHTML. Alles, was aus Daten oder Speicherstand kommt, läuft hier durch.
 function esc(s) {

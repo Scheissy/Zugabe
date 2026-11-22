@@ -17,7 +17,7 @@ function createCard(game, seed) {
     const f = game.felder[pool[k++]];
     cells.push(isComboEntry(f) ? comboCell(f) : f);
   }
-  return { seed: seed, cells: cells, marks: [], checks: {}, eigene: {} };
+  return { seed: seed, cells: cells, marks: [], checks: {}, eigene: {}, details: {} };
 }
 
 // Zelle aus einem Kombi-Feld der Daten: e = eigene Einträge erlaubt, h = Platzhalter für das Eingabefeld.
@@ -87,11 +87,24 @@ function startGame(id) {
   return true;
 }
 
-// Führt eine Änderung an der Karte aus und meldet, ob dadurch gerade ein Gewinn entstanden ist.
-function applyChange(game, card, mutate) {
-  const before = isWon(game, card);
+// Datum und Info eines Felds (oder null).
+function detailsOf(card, p) { return (card.details && card.details[p]) || null; }
+function hasInfo(card, p) { const d = detailsOf(card, p); return !!(d && d.i); }
+
+// Führt eine Änderung an Feld p aus und meldet, ob dadurch gerade ein Gewinn entstanden ist.
+// Wird das Feld dabei erstmals "geschafft", trägt die App das heutige Datum ein (Einstellung autoDatum),
+// sofern noch kein Datum gesetzt ist.
+function applyChange(game, card, mutate, p) {
+  const before = isWon(game, card), wasMarked = isMarked(card, p);
   mutate();
   const after = isWon(game, card);
+  if (!wasMarked && isMarked(card, p) && appState.settings.autoDatum) {
+    const cur = detailsOf(card, p);
+    if (!cur || !cur.d) {
+      card.details = card.details || {};
+      card.details[p] = Object.assign({ d: todayStr() }, cur && cur.i ? { i: cur.i } : {});
+    }
+  }
   saveToStorage();
   return { changed: true, won: after, justWon: after && !before };
 }
@@ -106,7 +119,7 @@ function toggleMark(id, p) {
   return applyChange(game, card, () => {
     const i = card.marks.indexOf(p);
     if (i >= 0) card.marks.splice(i, 1); else { card.marks.push(p); card.marks.sort((a, b) => a - b); }
-  });
+  }, p);
 }
 
 // Einen Punkt eines Kombi-Feldes abhaken (value true/false) oder umschalten (value weglassen).
@@ -123,7 +136,7 @@ function toggleCheck(id, p, i, value) {
   return applyChange(game, card, () => {
     const next = want ? [...list, i].sort((a, b) => a - b) : list.filter(x => x !== i);
     if (next.length) card.checks[p] = next; else delete card.checks[p];
-  });
+  }, p);
 }
 
 // Eigene Einträge (Freitext) eines Kombi-Feldes setzen: values ist die komplette Liste der Eingabefelder.
@@ -138,7 +151,25 @@ function setEigene(id, p, values) {
   return applyChange(game, card, () => {
     card.eigene = card.eigene || {};
     if (next.length) card.eigene[p] = next; else delete card.eigene[p];
-  });
+  }, p);
+}
+
+// Datum und/oder Info eines Felds setzen. patch = { d: 'JJJJ-MM-TT' } und/oder { i: 'Text' }; nur die
+// übergebenen Schlüssel ändern sich, leere oder ungültige Werte entfernen den jeweiligen Teil.
+function setDetail(id, p, patch) {
+  const none = { changed: false };
+  const game = gameById(id);
+  const card = appState.cards[id];
+  if (!game || !card || !Number.isInteger(p) || p < 0 || p >= card.cells.length || card.cells[p] === null || !patch || typeof patch !== 'object') return none;
+  const cur = detailsOf(card, p) || {};
+  let d = cur.d, i = cur.i;
+  if ('d' in patch) d = typeof patch.d === 'string' && isValidDate(patch.d) ? patch.d : undefined;
+  if ('i' in patch) i = (typeof patch.i === 'string' ? patch.i.trim().slice(0, MAX_INFO).trim() : '') || undefined;
+  if (d === cur.d && i === cur.i) return none;
+  card.details = card.details || {};
+  if (d || i) card.details[p] = Object.assign({}, d ? { d: d } : {}, i ? { i: i } : {}); else delete card.details[p];
+  saveToStorage();
+  return { changed: true };
 }
 
 function newCardFor(id) {
@@ -157,6 +188,7 @@ function resetMarks(id) {
   card.marks = [];
   card.checks = {};
   card.eigene = {};
+  card.details = {};
   saveToStorage();
 }
 function resetAllCards() {

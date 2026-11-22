@@ -117,12 +117,12 @@ function renderBoard() {
     if (isComboEntry(c)) {
       const k = comboCount(card, p);
       const lab = displayText(appState.settings.useKurz && kurzOf(game, c.t) || c.t);
-      return `<button type="button" class="cell n${n} combo${lab !== displayText(c.t) ? ' kurz' : ''}${isMarked(card, p) ? ' marked' : ''}${w}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${k} von ${c.ab} Häkchen" title="${esc(c.t)}" onclick="openCombo(${p})"><span class="cell-text">${esc(lab)}</span><span class="cell-progress">☑ ${k}/${c.ab}</span></button>`;
+      return `<button type="button" class="cell n${n} combo${lab !== displayText(c.t) ? ' kurz' : ''}${isMarked(card, p) ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${k} von ${c.ab} Häkchen" title="${esc(c.t)}" onclick="openCombo(${p})"><span class="cell-text">${esc(lab)}</span><span class="cell-progress">☑ ${k}/${c.ab}</span></button>`;
     }
     const m = card.marks.includes(p);
     const lab = displayText(appState.settings.useKurz && kurzOf(game, c) || c);
     const full = lab !== displayText(c) ? ` aria-label="${esc(c)}" title="${esc(c)}"` : '';
-    return `<button type="button" class="cell n${n}${lab !== displayText(c) ? ' kurz' : ''}${m ? ' marked' : ''}${w}" data-p="${p}"${full} aria-pressed="${m}" onclick="onCell(${p})">${esc(lab)}</button>`;
+    return `<button type="button" class="cell n${n}${lab !== displayText(c) ? ' kurz' : ''}${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}" data-p="${p}"${full} aria-pressed="${m}" onclick="onCell(${p})">${esc(lab)}</button>`;
   }).join('');
   renderLupe();
   fitBoard();
@@ -151,10 +151,14 @@ function renderLupe() {
   el.style.display = on ? '' : 'none';
   if (!on) return;
   const c = lupePos >= 0 ? card.cells[lupePos] : null;
-  if (c === null || c === undefined) { el.innerHTML = '<small>Tippe ein Feld an, um den ganzen Text hier zu lesen.</small>'; return; }
+  if (c === null || c === undefined) { el.innerHTML = '<small>Tippe ein Feld an, um den ganzen Text hier zu lesen. Lang drücken: Datum &amp; Info.</small>'; return; }
   const full = isComboEntry(c) ? c.t : c;
   const meta = isComboEntry(c) ? `☑ ${comboCount(card, lupePos)}/${c.ab}` : (card.marks.includes(lupePos) ? 'markiert' : 'nicht markiert');
-  el.innerHTML = `<span class="lupe-text">${esc(full)}</span><small>${esc(meta)}</small>`;
+  const det = detailsOf(card, lupePos);
+  el.innerHTML = `<span class="lupe-text">${esc(full)}</span><small>${esc(meta)}</small>`
+    + (det && det.d ? `<span class="lupe-detail">Datum: ${esc(formatDate(det.d))}</span>` : '')
+    + (det && det.i ? `<span class="lupe-info">${esc(det.i)}</span>` : '')
+    + `<button type="button" class="lupe-edit" onclick="openDetails(${lupePos})">${det ? 'Datum &amp; Info bearbeiten' : 'Datum &amp; Info ergänzen'}</button>`;
 }
 
 // ── KOMBI-FELDER: Checkliste im Dialog ───────────────────────────────────────
@@ -254,7 +258,7 @@ function onOwnChange() {
 
 function hasMarks() {
   const card = appState.cards[appState.activeGame];
-  return !!card && markedCount(card) + Object.keys(card.checks || {}).length + Object.keys(card.eigene || {}).length > 0;
+  return !!card && markedCount(card) + Object.keys(card.checks || {}).length + Object.keys(card.eigene || {}).length + Object.keys(card.details || {}).length > 0;
 }
 function askNewCard() {
   const id = appState.activeGame;

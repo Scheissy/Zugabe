@@ -36,6 +36,17 @@ felder: [ ['Gitarrist verpasst den Einsatz', 'Einsatz'], 'Regen im Konzert', { t
   Größere Felder zeigen mehr Text und eine größere Schrift. Beim Öffnen eines Spiels steht der Zoom wieder auf 100 %.
 - **Symbole optional:** Settings → „Symbole (Emojis) auf den Feldern“. Aus = Emojis werden von den Feldtexten entfernt, es passt mehr Text.
 
+### Datum und Info zu einem Feld
+
+Zu jedem Feld lässt sich ein Datum (wann geschafft) und ein Info-Text (z. B. wo, mit wem, bei welcher Band) speichern. Beides ist optional.
+
+- **Datum automatisch:** Beim Markieren eines Felds (bei Kombi-Feldern: beim Erreichen der Schwelle) trägt die App das heutige Datum ein, wenn noch keins gesetzt ist.
+  Settings → „Datum automatisch eintragen“ schaltet das ab. Ein eigenes Datum wird nie überschrieben.
+- **Bearbeiten:** Feld lang drücken oder in der Lupe „Datum & Info ergänzen/bearbeiten“. Im Dialog: Datumsfeld, „Heute“, „Entfernen“ und ein Info-Text (bis 200 Zeichen). Alles wird sofort gespeichert.
+- **Anzeige:** Die Lupe zeigt Datum und Info zum angetippten Feld; ein kleiner goldener Punkt auf dem Feld zeigt, dass eine Info vorhanden ist.
+- Entmarkieren löscht Datum und Info nicht. „Markierungen löschen“ und „Neue Karte“ setzen sie zurück (mit Rückfrage, auch wenn nur eine Info vorhanden ist).
+- Das Freifeld hat keine Details.
+
 Mitgeliefert: „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
 
 ## Kombi-Felder

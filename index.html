@@ -38,6 +38,30 @@
 </div>
 </div>
 
+<!-- DATUM UND INFO ZU EINEM FELD -->
+<div class="modal-backdrop" id="detailModal" onclick="modalBackdropClick(event)">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title" id="detailTitle"></div>
+<button class="modal-close" onclick="closeModal('detailModal')" aria-label="Schließen">✕</button>
+</div>
+<div class="modal-body">
+<label class="detail-label" for="detailDate">Datum</label>
+<div class="detail-date-row">
+<input type="date" id="detailDate" class="detail-input" onchange="onDetailDate(this.value)">
+<button type="button" class="prog-quick-btn" onclick="detailToday()">Heute</button>
+<button type="button" class="prog-quick-btn" onclick="detailClearDate()">Entfernen</button>
+</div>
+<label class="detail-label" for="detailInfo">Info (z. B. Ort, Band, Anlass)</label>
+<textarea id="detailInfo" class="detail-input" rows="3" maxlength="200" placeholder="Wo, mit wem, bei welchem Konzert …" oninput="onDetailInfo(this.value)"></textarea>
+<div class="detail-hint">Beides ist optional und wird sofort gespeichert.</div>
+</div>
+<div class="modal-footer">
+<button class="form-btn form-btn-save" onclick="closeModal('detailModal')">Fertig</button>
+</div>
+</div>
+</div>
+
 <!-- KOMBI-FELD: CHECKLISTE -->
 <div class="modal-backdrop" id="comboModal" onclick="modalBackdropClick(event)">
 <div class="modal">
@@ -136,6 +160,13 @@
 </div>
 <input type="checkbox" id="settingIcons" checked onchange="toggleSetting('icons', this.checked)">
 </label>
+<label class="settings-toggle-row">
+<div class="settings-toggle-text">
+<div class="settings-toggle-label">Datum automatisch eintragen</div>
+<div class="settings-toggle-desc">Beim Markieren eines Felds wird das heutige Datum gespeichert. Im Dialog „Datum &amp; Info“ lässt es sich ändern oder entfernen (Feld lang drücken oder in der Lupe antippen)</div>
+</div>
+<input type="checkbox" id="settingAutoDatum" checked onchange="toggleSetting('autoDatum', this.checked)">
+</label>
 <div class="settings-toggle-row">
 <div class="settings-toggle-text">
 <div class="settings-toggle-label">Lupe unter der Karte</div>
@@ -193,6 +224,7 @@ Alle Spiele und Felder stehen in bingo-data.js und werden zentral gepflegt – e
 <script src="js/04-ansicht.js"></script>
 <script src="js/05-einstellungen.js"></script>
 <script src="js/06-passung.js"></script>
+<script src="js/07-details.js"></script>
 <script src="js/99-main.js"></script>
 </body>
 </html>
