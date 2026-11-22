@@ -26,6 +26,15 @@ Dafür gibt es zwei Hilfen:
 felder: [ ['Gitarrist verpasst den Einsatz', 'Einsatz'], 'Regen im Konzert', { text: 'Wetter erlebt', kurz: 'Wetter', ab: 3, punkte: [ … ] } ]
 ```
 
+### Felder, Textanpassung und Zoom
+
+- **Alle Felder sind gleich groß** (quadratisch, unabhängig vom Text). Der Text wird in die Felder eingepasst, nicht umgekehrt.
+- **So viel Text wie möglich, aber lesbar** (`js/06-passung.js`): Die App nimmt den ganzen Text, wenn er ohne Wortbruch mit mindestens
+  10 px aufs Feld passt, sonst den Kurztext des Spiels, dann den ganzen Text bis hinunter zu 8 px, dann mit Silbentrennung und zuletzt gekürzt mit „…“.
+- **Zoom nur für das Spielfeld:** Zwei Finger auseinander oder die Tasten − / ＋ über der Karte (100 bis 400 %); die Prozentanzeige setzt auf 100 % zurück.
+  Größere Felder zeigen mehr Text und eine größere Schrift. Beim Öffnen eines Spiels steht der Zoom wieder auf 100 %.
+- **Symbole optional:** Settings → „Symbole (Emojis) auf den Feldern“. Aus = Emojis werden von den Feldtexten entfernt, es passt mehr Text.
+
 Mitgeliefert: „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
 
 ## Kombi-Felder

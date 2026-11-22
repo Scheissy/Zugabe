@@ -4,7 +4,7 @@
 
 // Prüft zuerst, ob alle Teile geladen wurden (z. B. nach einem unvollständigen Update oder bei
 // fehlender Datei im Offline-Cache) und warnt sichtbar, statt mit kryptischen Fehlern zu starten.
-const BINGO_EXPECTED_PARTS = ["01-data", "02-storage", "03-spiel", "04-ansicht", "05-einstellungen", "99-main"];
+const BINGO_EXPECTED_PARTS = ["01-data", "02-storage", "03-spiel", "04-ansicht", "05-einstellungen", "06-passung", "99-main"];
 function checkAppParts(expected) {
   const loaded = window.BINGO_PARTS || [];
   const missing = expected.filter(p => !loaded.includes(p));

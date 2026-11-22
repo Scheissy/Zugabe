@@ -84,6 +84,7 @@ function renderSpiele() {
 function openGame(id) {
   if (!startGame(id)) return;
   lupePos = -1;
+  resetZoom();
   switchTab('spiel');
 }
 
@@ -115,15 +116,16 @@ function renderBoard() {
     if (c === null) return `<div class="cell n${n} free marked${w}" data-p="${p}">Frei</div>`;
     if (isComboEntry(c)) {
       const k = comboCount(card, p);
-      const lab = appState.settings.useKurz && kurzOf(game, c.t) || c.t;
-      return `<button type="button" class="cell n${n} combo${lab !== c.t ? ' kurz' : ''}${isMarked(card, p) ? ' marked' : ''}${w}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${k} von ${c.ab} Häkchen" title="${esc(c.t)}" onclick="openCombo(${p})"><span class="cell-text">${esc(lab)}</span><span class="cell-progress">☑ ${k}/${c.ab}</span></button>`;
+      const lab = displayText(appState.settings.useKurz && kurzOf(game, c.t) || c.t);
+      return `<button type="button" class="cell n${n} combo${lab !== displayText(c.t) ? ' kurz' : ''}${isMarked(card, p) ? ' marked' : ''}${w}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${k} von ${c.ab} Häkchen" title="${esc(c.t)}" onclick="openCombo(${p})"><span class="cell-text">${esc(lab)}</span><span class="cell-progress">☑ ${k}/${c.ab}</span></button>`;
     }
     const m = card.marks.includes(p);
-    const lab = appState.settings.useKurz && kurzOf(game, c) || c;
-    const full = lab !== c ? ` aria-label="${esc(c)}" title="${esc(c)}"` : '';
-    return `<button type="button" class="cell n${n}${lab !== c ? ' kurz' : ''}${m ? ' marked' : ''}${w}" data-p="${p}"${full} aria-pressed="${m}" onclick="onCell(${p})">${esc(lab)}</button>`;
+    const lab = displayText(appState.settings.useKurz && kurzOf(game, c) || c);
+    const full = lab !== displayText(c) ? ` aria-label="${esc(c)}" title="${esc(c)}"` : '';
+    return `<button type="button" class="cell n${n}${lab !== displayText(c) ? ' kurz' : ''}${m ? ' marked' : ''}${w}" data-p="${p}"${full} aria-pressed="${m}" onclick="onCell(${p})">${esc(lab)}</button>`;
   }).join('');
   renderLupe();
+  fitBoard();
 }
 function onCell(p) {
   lupePos = p;

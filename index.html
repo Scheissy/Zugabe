@@ -88,7 +88,12 @@
 <div class="board-meta" id="boardMeta"></div>
 </div>
 <div class="board-banner" id="boardBanner" role="status" style="display:none"></div>
-<div class="board" id="board"></div>
+<div class="zoom-bar">
+<button type="button" class="zoom-btn" id="zoomOut" onclick="zoomStep(-1)" aria-label="Spielfeld verkleinern">−</button>
+<button type="button" class="zoom-btn zoom-val" id="zoomVal" onclick="setZoom(100)" aria-label="Zoom zurücksetzen">100 %</button>
+<button type="button" class="zoom-btn" id="zoomIn" onclick="zoomStep(1)" aria-label="Spielfeld vergrößern">＋</button>
+</div>
+<div class="board-scroll" id="boardScroll"><div class="board" id="board"></div></div>
 <div class="lupe" id="lupe" role="status" aria-live="polite" style="display:none"></div>
 <div class="board-actions">
 <button type="button" class="prog-quick-btn" id="btnResetMarks" onclick="askResetMarks()">Markierungen löschen</button>
@@ -118,10 +123,17 @@
 </label>
 <label class="settings-toggle-row">
 <div class="settings-toggle-text">
-<div class="settings-toggle-label">Kurztexte auf den Feldern</div>
-<div class="settings-toggle-desc">Wo ein Spiel Kurztexte hat, steht auf dem Feld der kurze Text statt des ganzen; aus = immer der ganze Text</div>
+<div class="settings-toggle-label">Kurztexte, wenn der ganze Text nicht passt</div>
+<div class="settings-toggle-desc">Die App zeigt so viel Text wie lesbar möglich. Passt der ganze Text nicht aufs Feld, nimmt sie den Kurztext des Spiels (Zoomen zeigt mehr). Aus = immer der ganze Text, notfalls kleiner oder gekürzt</div>
 </div>
 <input type="checkbox" id="settingUseKurz" checked onchange="toggleSetting('useKurz', this.checked)">
+</label>
+<label class="settings-toggle-row">
+<div class="settings-toggle-text">
+<div class="settings-toggle-label">Symbole (Emojis) auf den Feldern</div>
+<div class="settings-toggle-desc">Aus = nur Text, dadurch passt mehr Text auf die Felder</div>
+</div>
+<input type="checkbox" id="settingIcons" checked onchange="toggleSetting('icons', this.checked)">
 </label>
 <div class="settings-toggle-row">
 <div class="settings-toggle-text">
@@ -179,6 +191,7 @@ Alle Spiele und Felder stehen in bingo-data.js und werden zentral gepflegt – e
 <script src="js/03-spiel.js"></script>
 <script src="js/04-ansicht.js"></script>
 <script src="js/05-einstellungen.js"></script>
+<script src="js/06-passung.js"></script>
 <script src="js/99-main.js"></script>
 </body>
 </html>

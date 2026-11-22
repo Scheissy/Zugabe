@@ -7,6 +7,7 @@ function applySettingsUI() {
   document.getElementById('settingConfirmNewCard').checked = appState.settings.confirmNewCard;
   document.getElementById('settingShowCounter').checked = appState.settings.showCounter;
   document.getElementById('settingUseKurz').checked = appState.settings.useKurz;
+  document.getElementById('settingIcons').checked = appState.settings.icons;
   document.getElementById('settingLupe').value = appState.settings.lupe;
 }
 function toggleSetting(key, value) {

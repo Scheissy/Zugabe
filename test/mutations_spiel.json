@@ -6,7 +6,8 @@
   "test/test_validation.js",
   "test/test_kombi.js",
   "test/test_kombi_eigene.js",
-  "test/test_lupe.js"
+  "test/test_lupe.js",
+  "test/test_fit.js"
  ],
  "mutations": [
   {
@@ -204,8 +205,8 @@
   {
    "name": "L3 aria-label/Tooltip nicht maskiert",
    "file": "js/04-ansicht.js",
-   "old": "const full = lab !== c ? ` aria-label=\"${esc(c)}\" title=\"${esc(c)}\"` : '';",
-   "new": "const full = lab !== c ? ` aria-label=\"${c}\" title=\"${c}\"` : '';"
+   "old": "const full = lab !== displayText(c) ? ` aria-label=\"${esc(c)}\" title=\"${esc(c)}\"` : '';",
+   "new": "const full = lab !== displayText(c) ? ` aria-label=\"${c}\" title=\"${c}\"` : '';"
   },
   {
    "name": "L4 Lupe automatisch nur bei Kurztexten (nicht ab 7×7)",
@@ -222,8 +223,8 @@
   {
    "name": "L6 Einstellung 'Kurztexte' wirkungslos",
    "file": "js/04-ansicht.js",
-   "old": "const lab = appState.settings.useKurz && kurzOf(game, c) || c;",
-   "new": "const lab = kurzOf(game, c) || c;"
+   "old": "const lab = displayText(appState.settings.useKurz && kurzOf(game, c) || c);",
+   "new": "const lab = displayText(kurzOf(game, c) || c);"
   },
   {
    "name": "L7 Neue Karte lässt die Lupe stehen",
@@ -236,6 +237,84 @@
    "file": "js/05-einstellungen.js",
    "old": "  if (!LUPE_MODES.includes(value)) return;\n",
    "new": ""
+  },
+  {
+   "name": "F1 Mindestschrift für lesbaren Text ignoriert",
+   "file": "js/06-passung.js",
+   "old": "const hit = pass(pref, false) || pass(min, false) || pass(min, true);",
+   "new": "const hit = pass(min, false) || pass(min, true);"
+  },
+  {
+   "name": "F2 Kürzen liefert den ungekürzten Text",
+   "file": "js/06-passung.js",
+   "old": "const text = lo ? v.slice(0, lo).trimEnd() + '…' : '…';",
+   "new": "const text = v;"
+  },
+  {
+   "name": "F3 Zoom nach oben nicht begrenzt",
+   "file": "js/06-passung.js",
+   "old": "z = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z)));",
+   "new": "z = Math.max(ZOOM_MIN, Math.round(z));"
+  },
+  {
+   "name": "F4 Zwei-Finger-Zoom läuft bei einem Finger weiter",
+   "file": "js/06-passung.js",
+   "old": "if (!pinch || e.touches.length !== 2) return;",
+   "new": "if (!pinch) return;"
+  },
+  {
+   "name": "F5 Symbol-Einstellung wirkungslos",
+   "file": "js/06-passung.js",
+   "old": "return appState.settings.icons ? String(s) : stripIcons(s);",
+   "new": "return String(s);"
+  },
+  {
+   "name": "F6 Felder wachsen mit dem Inhalt (min-height fehlt)",
+   "file": "css/app.css",
+   "old": "min-width: 0; min-height: 0; overflow: hidden; }",
+   "new": "min-width: 0; overflow: hidden; }"
+  },
+  {
+   "name": "F7 Karte wird nach dem Zeichnen nicht angepasst",
+   "file": "js/04-ansicht.js",
+   "old": "  renderLupe();\n  fitBoard();\n}\nfunction onCell(p) {",
+   "new": "  renderLupe();\n}\nfunction onCell(p) {"
+  },
+  {
+   "name": "F8 Zoom bleibt beim Öffnen eines Spiels stehen",
+   "file": "js/04-ansicht.js",
+   "old": "  lupePos = -1;\n  resetZoom();",
+   "new": "  lupePos = -1;"
+  },
+  {
+   "name": "F9 Kombi-Feld reserviert keine Höhe für den Fortschritt",
+   "file": "js/06-passung.js",
+   "old": "reserve: combo ? (s => s * 0.98 + 3) : null",
+   "new": "reserve: null"
+  },
+  {
+   "name": "F10 Brennpunkt des Zooms ignoriert",
+   "file": "js/06-passung.js",
+   "old": "const ox = fx === undefined ? sc.clientWidth / 2 : fx,",
+   "new": "const ox = sc.clientWidth / 2,"
+  },
+  {
+   "name": "F11 Zoom-Schritt falsch",
+   "file": "js/06-passung.js",
+   "old": "boardZoom * (dir > 0 ? 1.25 : 0.8)",
+   "new": "boardZoom * (dir > 0 ? 1.25 : 1.25)"
+  },
+  {
+   "name": "F12 Silbentrennung ohne Trennstrich",
+   "file": "js/06-passung.js",
+   "old": "lines.push(rest.slice(0, Math.max(k, 1)) + '-');",
+   "new": "lines.push(rest.slice(0, Math.max(k, 1)));"
+  },
+  {
+   "name": "F13 Ganzer Text fehlt bei Kurztext im aria-label",
+   "file": "js/06-passung.js",
+   "old": "if (res.cut || res.variant > 0) {",
+   "new": "if (false) {"
   }
  ]
 }
