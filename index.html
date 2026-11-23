@@ -38,6 +38,21 @@
 </div>
 </div>
 
+<!-- SICHERUNG IMPORTIEREN -->
+<div class="modal-backdrop" id="importModal" onclick="modalBackdropClick(event)">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title">Sicherung importieren</div>
+<button class="modal-close" onclick="closeModal('importModal')" aria-label="Schließen">✕</button>
+</div>
+<div class="modal-body" id="importBody"></div>
+<div class="modal-footer">
+<button class="form-btn form-btn-cancel" onclick="closeModal('importModal')">Abbrechen</button>
+<button class="form-btn form-btn-save" id="importYes" onclick="runImport()">Importieren</button>
+</div>
+</div>
+</div>
+
 <!-- DATUM UND INFO ZU EINEM FELD -->
 <div class="modal-backdrop" id="detailModal" onclick="modalBackdropClick(event)">
 <div class="modal">
@@ -190,8 +205,24 @@
 </div>
 </div>
 <div class="io-section">
+<div class="io-section-title">Sicherung</div>
+<div class="io-btn" onclick="exportBackup()">
+<div class="io-btn-text">
+<div class="io-btn-label neutral">Spielstände exportieren</div>
+<div class="io-btn-desc">Speichert alle Karten mit Markierungen, Häkchen, Datum und Info in einer Datei</div>
+</div>
+</div>
+<div class="io-btn" onclick="chooseImportFile()">
+<div class="io-btn-text">
+<div class="io-btn-label neutral">Spielstände importieren</div>
+<div class="io-btn-desc">Liest eine Sicherungsdatei ein. Vorher wird für jedes Spiel geprüft, ob alle Felder im Spiel vorhanden sind</div>
+</div>
+</div>
+<input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="onImportFile(this)">
+</div>
+<div class="io-section">
 <div class="io-section-title">Zurücksetzen</div>
-<div class="io-btn" onclick="askResetAll()">
+<div class="io-btn" id="btnResetAll" onclick="askResetAll()">
 <div class="io-btn-text">
 <div class="io-btn-label">Alle Karten und Markierungen löschen</div>
 <div class="io-btn-desc">Setzt den Spielstand aller Spiele zurück, die Einstellungen bleiben</div>
@@ -225,6 +256,7 @@ Alle Spiele und Felder stehen in bingo-data.js und werden zentral gepflegt – e
 <script src="js/05-einstellungen.js"></script>
 <script src="js/06-passung.js"></script>
 <script src="js/07-details.js"></script>
+<script src="js/08-sicherung.js"></script>
 <script src="js/99-main.js"></script>
 </body>
 </html>

@@ -80,6 +80,17 @@ function sanitizeCard(game, raw) {
   return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene, details: details };
 }
 
+// Macht aus gespeicherten oder importierten Einstellungen gültige: falsche Typen und unbekannte Werte fallen auf den Standard.
+function sanitizeSettings(raw) {
+  const s = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const bool = k => typeof s[k] === 'boolean' ? s[k] : DEFAULT_SETTINGS[k];
+  return {
+    confirmNewCard: bool('confirmNewCard'), showCounter: bool('showCounter'), useKurz: bool('useKurz'),
+    icons: bool('icons'), autoDatum: bool('autoDatum'),
+    lupe: LUPE_MODES.includes(s.lupe) ? s.lupe : DEFAULT_SETTINGS.lupe
+  };
+}
+
 function saveToStorage() {
   stateVersion++;
   try {
@@ -107,15 +118,7 @@ function loadFromStorage() {
       if (card) cards[id] = card;
     });
     appState.cards = cards;
-    const s = data.settings && typeof data.settings === 'object' ? data.settings : {};
-    appState.settings = {
-      confirmNewCard: typeof s.confirmNewCard === 'boolean' ? s.confirmNewCard : DEFAULT_SETTINGS.confirmNewCard,
-      showCounter: typeof s.showCounter === 'boolean' ? s.showCounter : DEFAULT_SETTINGS.showCounter,
-      useKurz: typeof s.useKurz === 'boolean' ? s.useKurz : DEFAULT_SETTINGS.useKurz,
-      icons: typeof s.icons === 'boolean' ? s.icons : DEFAULT_SETTINGS.icons,
-      autoDatum: typeof s.autoDatum === 'boolean' ? s.autoDatum : DEFAULT_SETTINGS.autoDatum,
-      lupe: LUPE_MODES.includes(s.lupe) ? s.lupe : DEFAULT_SETTINGS.lupe
-    };
+    appState.settings = sanitizeSettings(data.settings);
     appState.activeGame = typeof data.activeGame === 'string' && games.some(g => g.id === data.activeGame) ? data.activeGame : '';
   } catch (e) { safeLog('Load error', e); }
 }

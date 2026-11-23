@@ -8,7 +8,8 @@
   "test/test_kombi_eigene.js",
   "test/test_lupe.js",
   "test/test_fit.js",
-  "test/test_details.js"
+  "test/test_details.js",
+  "test/test_sicherung.js"
  ],
  "mutations": [
   {
@@ -430,6 +431,102 @@
    "file": "css/app.css",
    "old": "minmax(0, 1fr)); gap: 6px; }",
    "new": "minmax(0, 1fr)); gap: 6px; row-gap: 9px; }"
+  },
+  {
+   "name": "B1 Fehlende Felder werden beim Import nicht geprüft",
+   "file": "js/08-sicherung.js",
+   "old": "} else if (!plain.has(c)) missing.push(c);",
+   "new": "} else if (false) missing.push(c);"
+  },
+  {
+   "name": "B2 Doppelte Felder werden nicht geprüft",
+   "file": "js/08-sicherung.js",
+   "old": "if (seen.has(key)) dups.push(key);",
+   "new": ""
+  },
+  {
+   "name": "B3 Eigene Einträge des Kombi-Felds werden nicht verglichen",
+   "file": "js/08-sicherung.js",
+   "old": " && !!cell.e === (f.eigene === true)",
+   "new": ""
+  },
+  {
+   "name": "B4 Schwelle des Kombi-Felds wird nicht verglichen",
+   "file": "js/08-sicherung.js",
+   "old": "return cell.ab === f.ab && ",
+   "new": "return "
+  },
+  {
+   "name": "B5 Einstellungen werden ohne Haken übernommen",
+   "file": "js/08-sicherung.js",
+   "old": "if (opts && opts.settings && analysis.hasSettings)",
+   "new": "if (analysis.hasSettings)"
+  },
+  {
+   "name": "B6 Fremdes Dateiformat wird akzeptiert",
+   "file": "js/08-sicherung.js",
+   "old": "Array.isArray(b) || b.format !== BACKUP_FORMAT) return",
+   "new": "Array.isArray(b)) return"
+  },
+  {
+   "name": "B7 Neuere Sicherungsversion wird akzeptiert",
+   "file": "js/08-sicherung.js",
+   "old": "if (b.version > BACKUP_VERSION) return",
+   "new": "if (false) return"
+  },
+  {
+   "name": "B8 Abweichende Kartengröße wird ignoriert",
+   "file": "js/08-sicherung.js",
+   "old": "if (entry.groesse !== undefined && entry.groesse !== game.groesse) {",
+   "new": "if (false) {"
+  },
+  {
+   "name": "B9 Abgelehnte Karten werden trotzdem übernommen",
+   "file": "js/08-sicherung.js",
+   "old": "if (g.status === 'ok') { appState.cards[g.id] = g.card; n++; }",
+   "new": "{ appState.cards[g.id] = g.card; n++; }"
+  },
+  {
+   "name": "B10 Meldungen aus der Datei werden nicht maskiert",
+   "file": "js/08-sicherung.js",
+   "old": "<small>${esc(p)}</small>",
+   "new": "<small>${p}</small>"
+  },
+  {
+   "name": "B11 Export enthält nur das erste Spiel",
+   "file": "js/08-sicherung.js",
+   "old": "Object.keys(appState.cards).forEach(id => {",
+   "new": "Object.keys(appState.cards).slice(0, 1).forEach(id => {"
+  },
+  {
+   "name": "B12 Import wird nicht gespeichert",
+   "file": "js/08-sicherung.js",
+   "old": "  saveToStorage();\n  return n;",
+   "new": "  return n;"
+  },
+  {
+   "name": "B13 Dateiauswahl wird nicht geleert",
+   "file": "js/08-sicherung.js",
+   "old": "  input.value = '';",
+   "new": ""
+  },
+  {
+   "name": "B14 Zu große Datei wird gelesen",
+   "file": "js/08-sicherung.js",
+   "old": "if (text.length > BACKUP_MAX_BYTES) return",
+   "new": "if (false) return"
+  },
+  {
+   "name": "B15 Importierte Einstellungen werden nicht geprüft",
+   "file": "js/08-sicherung.js",
+   "old": "appState.settings = sanitizeSettings(backup.settings);",
+   "new": "appState.settings = backup.settings;"
+  },
+  {
+   "name": "B16 Importieren trotz 0 gültiger Karten möglich",
+   "file": "js/08-sicherung.js",
+   "old": "yes.disabled = ok === 0;",
+   "new": "yes.disabled = false;"
   }
  ]
 }

@@ -49,6 +49,21 @@ Zu jedem Feld lässt sich ein Datum (wann geschafft) und ein Info-Text (z. B. wo
 - Entmarkieren löscht Datum und Info nicht. „Markierungen löschen“ und „Neue Karte“ setzen sie zurück (mit Rückfrage, auch wenn nur eine Info vorhanden ist).
 - Das Freifeld hat keine Details.
 
+### Sicherung (Export und Import)
+
+Settings → „Sicherung“: Alle Spielstände lassen sich in einer Datei sichern (`zugabe-sicherung-<Datum>.json`) und wieder einlesen,
+etwa für ein neues Handy. Die Datei enthält je Spiel die Karte mit Markierungen, Häkchen, eigenen Einträgen, Datum und Info sowie die Einstellungen.
+
+Beim Import wird **jede Karte einzeln gegen das aktuelle Spiel geprüft**, bevor etwas übernommen wird:
+
+- das Spiel muss in der App vorhanden sein (gleiche `id`), die Kartengröße und das Freifeld müssen passen
+- **jedes Feld der Karte muss im Spiel vorhanden sein**; Kombi-Felder müssen unverändert sein (Punkte, Schwelle, eigene Einträge), sonst passen die Häkchen nicht mehr
+- kein Feld darf doppelt vorkommen; ungültige Markierungen, Häkchen, Datumsangaben usw. werden aussortiert
+- Dateien mit falschem Format, unbekannter oder neuerer Versionsnummer, ungültigem JSON oder über 5 MB werden abgelehnt
+
+Der Dialog zeigt je Spiel „✓ importierbar“ (mit Hinweis, ob eine vorhandene Karte ersetzt wird) oder „✕“ mit dem Grund. Übernommen werden nur die geprüften
+Karten; Karten anderer Spiele und abgelehnte Karten bleiben unverändert. Die Einstellungen werden nur mit gesetztem Haken übernommen (und ebenfalls geprüft).
+
 Mitgeliefert: „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
 
 ## Kombi-Felder

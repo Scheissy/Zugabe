@@ -94,7 +94,7 @@ const { loadApp, reloadWithState, createChecker, createHelpers } = require('./te
   w.closeModal('installModal');
 
   // Alles zurücksetzen
-  H.click(d.querySelector('.io-btn'));
+  H.click(d.getElementById('btnResetAll'));
   t.check('"Alles löschen" fragt nach.', H.modalOpen('confirmModal'));
   H.click(d.getElementById('confirmYes'));
   t.check('Danach gibt es keine Karten mehr, Einstellungen bleiben.', Object.keys(w.eval('appState.cards')).length === 0 && w.eval('appState.settings.showCounter') === false);

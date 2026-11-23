@@ -133,6 +133,17 @@ textarea.detail-input { resize: vertical; min-height: 76px; }
 .io-btn { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; }
 .io-btn:active { background: var(--surface2); }
 .io-btn-label { font-size: 14px; font-weight: 600; color: var(--red); }
+.io-btn-label.neutral { color: var(--text); }
+.imp-head { font-size: 13px; color: var(--text2); }
+.imp-row { display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border-radius: var(--radius-sm); background: var(--surface2); }
+.imp-row b { font-size: 14px; }
+.imp-row small { font-size: 12px; color: var(--text2); line-height: 1.4; overflow-wrap: anywhere; }
+.imp-ok { border-left: 3px solid var(--green); }
+.imp-bad { border-left: 3px solid var(--red); }
+.imp-error { font-size: 14px; line-height: 1.5; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface2); border-left: 3px solid var(--red); }
+.imp-settings { display: flex; align-items: center; gap: 10px; font-size: 14px; padding: 6px 2px; cursor: pointer; }
+.imp-settings input { width: 20px; height: 20px; accent-color: var(--accent); }
+.form-btn:disabled { opacity: 0.4; cursor: default; }
 .io-btn-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
 .info-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; font-size: 12px; color: var(--text2); line-height: 1.5; }
 .info-box b { color: var(--text); }
