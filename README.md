@@ -70,7 +70,8 @@ Mit `fest: true` folgt die Karte der Reihenfolge der Felder im Spiel statt zufä
 gibt es mehr Felder als Plätze, werden die ersten genommen). So lässt sich eine bestehende, feste Karte nachbauen. „Neue Karte“ liefert dann
 dieselbe Anordnung, nur ohne Markierungen. Ohne `fest` wird bei jeder neuen Karte gemischt.
 
-Mitgeliefert: „Konzerte Bingo Season 10“ (7×7, feste Karte, aus einem Screenshot übernommen), „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
+Mitgeliefert: „Konzerte Bingo Season 10“ (7×7, feste Karte aus einem Screenshot; die ersten 49 Felder bilden die Karte, weitere Felder aus einer zweiten Karte stehen
+für den Import bereit, dort mit `?` markierte Felder waren im Screenshot abgeschnitten), „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
 
 ## Kombi-Felder
 
