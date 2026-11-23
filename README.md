@@ -64,7 +64,13 @@ Beim Import wird **jede Karte einzeln gegen das aktuelle Spiel geprüft**, bevor
 Der Dialog zeigt je Spiel „✓ importierbar“ (mit Hinweis, ob eine vorhandene Karte ersetzt wird) oder „✕“ mit dem Grund. Übernommen werden nur die geprüften
 Karten; Karten anderer Spiele und abgelehnte Karten bleiben unverändert. Die Einstellungen werden nur mit gesetztem Haken übernommen (und ebenfalls geprüft).
 
-Mitgeliefert: „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
+### Feste Karten
+
+Mit `fest: true` folgt die Karte der Reihenfolge der Felder im Spiel statt zufällig gemischt zu werden (ein Freifeld in der Mitte bleibt frei;
+gibt es mehr Felder als Plätze, werden die ersten genommen). So lässt sich eine bestehende, feste Karte nachbauen. „Neue Karte“ liefert dann
+dieselbe Anordnung, nur ohne Markierungen. Ohne `fest` wird bei jeder neuen Karte gemischt.
+
+Mitgeliefert: „Konzerte Bingo Season 10“ (7×7, feste Karte, aus einem Screenshot übernommen), „Festival-Woche“ (7×7, echte Kurztexte) und „Testkarte 9×9 (Dummydaten)“.
 
 ## Kombi-Felder
 

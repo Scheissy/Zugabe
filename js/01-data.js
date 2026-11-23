@@ -107,6 +107,7 @@ function validateGames(list) {
     if (typeof g.titel !== 'string' || !g.titel.trim()) add(id, 'fehler', 'titel fehlt');
     if (!GROESSEN.includes(g.groesse)) add(id, 'fehler', 'groesse muss 3, 4, 5, 7 oder 9 sein');
     if (!ZIELE.includes(g.ziel)) add(id, 'fehler', "ziel muss 'linie' oder 'vollbild' sein");
+    if (g.fest !== undefined && typeof g.fest !== 'boolean') add(id, 'fehler', 'fest muss true oder false sein');
     if (!Array.isArray(g.felder) || g.felder.some(f => !(typeof f === 'string' ? f.trim() : isComboEntry(f)))) {
       add(id, 'fehler', 'felder muss eine Liste aus nicht-leeren Texten oder Kombi-Feldern sein');
       return;

@@ -9,7 +9,8 @@
   "test/test_lupe.js",
   "test/test_fit.js",
   "test/test_details.js",
-  "test/test_sicherung.js"
+  "test/test_sicherung.js",
+  "test/test_fest.js"
  ],
  "mutations": [
   {
@@ -527,6 +528,18 @@
    "file": "js/08-sicherung.js",
    "old": "yes.disabled = ok === 0;",
    "new": "yes.disabled = false;"
+  },
+  {
+   "name": "G1 Feste Karte wird trotzdem gemischt",
+   "file": "js/03-spiel.js",
+   "old": "(game.fest ? idx : shuffleSeeded(idx, seed))",
+   "new": "shuffleSeeded(idx, seed)"
+  },
+  {
+   "name": "G2 Typ von 'fest' wird nicht geprüft",
+   "file": "js/01-data.js",
+   "old": "if (g.fest !== undefined && typeof g.fest !== 'boolean') add(id, 'fehler', 'fest muss true oder false sein');",
+   "new": ""
   }
  ]
 }

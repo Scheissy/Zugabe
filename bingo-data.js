@@ -5,6 +5,8 @@
 //   beschreibung ein kurzer Satz für die Spieleliste (optional)
 //   groesse      3, 4, 5, 7 oder 9 (Karte ist groesse × groesse)
 //   freiMitte    true = mittleres Feld ist ein Freifeld (nur bei ungerader Größe sinnvoll)
+//   fest         optional, true = feste Karte: die Felder stehen in der Reihenfolge der Liste (Freifeld in der Mitte
+//                bleibt frei); ohne fest wird bei jeder neuen Karte zufällig gemischt und ausgewählt
 //   ziel         'linie' (eine volle Reihe/Spalte/Diagonale gewinnt) oder 'vollbild' (alle Felder)
 //   felder       Liste aller möglichen Felder; es dürfen MEHR sein als auf die Karte passen,
 //                dann wird bei jeder neuen Karte zufällig ausgewählt. Ein Eintrag ist entweder ein Text
@@ -21,7 +23,7 @@
 //                erscheint beim Antippen in der Lupe unter der Karte.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 5;
+const BINGO_DATA_VERSION = 6;
 
 // Dummydaten für die Testkarte 9×9: 9 Akteure × 9 Ereignisse = 81 verschiedene Felder mit Kurztext.
 const DUMMY_FELDER = (() => {
@@ -32,6 +34,23 @@ const DUMMY_FELDER = (() => {
   return out;
 })();
 const BINGO_GAMES = [
+  {
+    // Aus einem Screenshot übernommen (7 × 7, Reihenfolge Zeile für Zeile); die im Screenshot angeschnittenen Felder
+    // wurden mit dem vollen Wortlaut ergänzt. "Le HH B Hal HB" = Leipzig, Hamburg, Braunschweig, Halle, Bremen.
+    id: 'konzerte-bingo-season-10',
+    titel: 'Konzerte Bingo Season 10',
+    beschreibung: '7×7, feste Karte (Reihenfolge wie im Original)',
+    groesse: 7, freiMitte: false, ziel: 'linie', fest: true,
+    felder: [
+      'Gesang in 6 Sprachen', 'Feature vom Band', 'Überraschungsgast auf der Bühne', 'nur einer von 4', '30 Minuten Verspätung', 'vor Ort erkennen, dass die Band schon kannte', 'Weniger als eine Stunde Hauptact',
+      'Weihnachtskonzert', 'plötzlich selbst on Stage', 'alle in die Knie gehen', 'Kein Le HH B Hal HB Konzert', 'Bands zweimal im Jahr sehen', 'Flinta Moshpit zum Ausruhen', '5 Tage am Stück Konzerte',
+      'Keine Zugabe spielen', 'über 2 Stunden Hauptact', 'Neue Location', 'Special Location', 'Signierte Support Vinyl', 'Künstler zu Tränen gerührt', 'Moshpit mit Band',
+      'Text oder Akkorde vergessen', 'Künstler freestyled', 'Reunion Konzert', 'Beyoncé auch vom Band', 'T-Shirt kaufen', 'Tagesfestival mit 5 Bands', 'Schallplatte an der Garderobe abgeben',
+      'von der Disco raus geworfen werden', 'Musiker aus anderen Bands im Publikum', 'Secu erkennt dich.', 'Wir sind Helden Cover', 'RBF Entdeckung', 'Open Air Konzert', 'Abschiedstournee',
+      'vorher nicht reingehört, dann Vinyl gekauft', '5 Tage ohne Konzert', 'Felix in Berlin besuchen', 'Hip Hop Crew aus den 90ern', 'Unsignierte Vinyl mitnehmen', 'Künstler erkennt dich', '2 unterschiedliche Locations an einem Tag',
+      'Vinyl für Discogs erstellen', '3 Monate vorher Ticket kaufen', 'Ihr Süßmäuse von der Bühne', 'keine Vinyl dabei', 'Dutch Disease', 'Band zum 5. mal sehen', 'Künstler verteilen Alkohol'
+    ]
+  },
   {
     id: 'festival',
     titel: 'Festival',

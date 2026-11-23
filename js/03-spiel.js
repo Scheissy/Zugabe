@@ -9,7 +9,9 @@ function newSeed() { return Math.floor(Math.random() * 2147483647); }
 function createCard(game, seed) {
   const total = game.groesse * game.groesse;
   const free = freePositions(game);
-  const pool = shuffleSeeded(game.felder.map((_, i) => i), seed).slice(0, felderBenoetigt(game));
+  const idx = game.felder.map((_, i) => i);
+  // fest: true = die Karte folgt der Reihenfolge der Felder im Spiel (bei mehr Feldern als Plätzen: die ersten); sonst zufällig gemischt
+  const pool = (game.fest ? idx : shuffleSeeded(idx, seed)).slice(0, felderBenoetigt(game));
   const cells = [];
   let k = 0;
   for (let p = 0; p < total; p++) {
