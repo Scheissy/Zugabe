@@ -23,7 +23,7 @@
 //                erscheint beim Antippen in der Lupe unter der Karte.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 7;
+const BINGO_DATA_VERSION = 8;
 
 // Dummydaten für die Testkarte 9×9: 9 Akteure × 9 Ereignisse = 81 verschiedene Felder mit Kurztext.
 const DUMMY_FELDER = (() => {
@@ -39,7 +39,7 @@ const BINGO_GAMES = [
     // wurden mit dem vollen Wortlaut ergänzt. "Le HH B Hal HB" = Leipzig, Hamburg, Braunschweig, Halle, Bremen.
     id: 'konzerte-bingo-season-10',
     titel: 'Konzerte Bingo Season 10',
-    beschreibung: '7×7, feste Karte (Reihenfolge wie im Original), mit zusätzlichen Feldern für den Import',
+    beschreibung: '7×7, feste Karte (Reihenfolge wie im Original)',
     groesse: 7, freiMitte: false, ziel: 'linie', fest: true,
     felder: [
       'Gesang in 6 Sprachen', 'Feature vom Band', 'Überraschungsgast auf der Bühne', 'nur einer von 4 Rappern gut', '30 Minuten Verspätung', 'vor Ort erkennen, dass die Band schon kannte', 'Weniger als eine Stunde Hauptact',
@@ -48,11 +48,10 @@ const BINGO_GAMES = [
       'Text oder Akkorde vergessen', 'Künstler freestyled', 'Reunion Konzert', 'Beyoncé auch vom Band', 'T-Shirt kaufen', 'Tagesfestival mit 5 Bands', 'Schallplatte an der Garderobe abgeben',
       'von der Disco raus geworfen werden', 'Musiker aus anderen Bands im Publikum', 'Secu erkennt dich.', 'Wir sind Helden Cover', 'RBF Entdeckung', 'Open Air Konzert', 'Abschiedstournee',
       'vorher nicht reingehört, dann Vinyl gekauft', '5 Tage ohne Konzert', 'Felix in Berlin besuchen', 'Hip Hop Crew aus den 90ern', 'Unsignierte Vinyl mitnehmen', 'Künstler erkennt dich', '2 unterschiedliche Locations an einem Tag',
-      'Vinyl für Discogs erstellen', '3 Monate vorher Ticket kaufen', 'Ihr Süßmäuse von der Bühne', 'keine Vinyl dabei', 'Dutch Disease', 'Band zum 5. mal sehen', 'Künstler verteilen Alkohol',
+      'Vinyl für Discogs erstellen', '3 Monate vorher Ticket kaufen', 'Ihr Süßmäuse von der Bühne', 'keine Vinyl dabei', 'Dutch Disease Leute quatschen', 'Band zum 5. mal sehen', 'Künstler verteilen Alkohol',
       // Ab hier: Felder, die auf einer zweiten Karte desselben Spiels vorkamen (andere Anordnung). Die ersten 49 Felder bilden
-      // die feste Karte; diese hier sind für den Import weiterer Spielstände da. Mit "?" markiert = im Screenshot abgeschnitten.
-      'Amerikanische Künstler', 'RBF Location', 'Unsignierte Vinyl mitbringen' /* ? gleiches Feld wie "mitnehmen"? */,
-      '4 Rapper auf der Bühne hö…' /* ? */, 'Dutch Disease Leute qua…' /* ? */
+      // die feste Karte; diese hier sind für den Import weiterer Spielstände da.
+      'Amerikanische Künstler', 'RBF Location', '4 Rapper auf der Bühne höchstens einer kann rappen'
     ]
   },
   {
