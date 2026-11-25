@@ -2,6 +2,19 @@
 // Teil der App: klassisches Skript im gemeinsamen globalen Bereich (Ladereihenfolge siehe index.html).
 (window.BINGO_PARTS = window.BINGO_PARTS || []).push('07-details');
 
+// Beim langen Drücken startet der Browser (Android) zusätzlich seine eigene Textauswahl - sie landet dann auf dem Text, der nach dem
+// Öffnen des Dialogs unter dem Finger liegt. Neben dem CSS (keine Textauswahl im Dialog) räumen wir eine angefangene Auswahl weg,
+// aber nie, solange der Cursor in einem Eingabefeld steht.
+function clearSelection() {
+  const sel = window.getSelection && window.getSelection();
+  const ae = document.activeElement;
+  if (sel && sel.rangeCount && !(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName))) sel.removeAllRanges();
+}
+function clearSelectionSoon() {
+  clearSelection();
+  [150, 700].forEach(ms => setTimeout(clearSelection, ms));
+}
+
 // Dialog: Datum (Datumsfeld, "Heute", "Entfernen") und Info-Text. Alles ist optional und wird sofort gespeichert.
 let detailPos = -1;
 function openDetails(p) {
@@ -16,6 +29,7 @@ function openDetails(p) {
   document.getElementById('detailInfo').value = det.i || '';
   renderLupe();
   renderCountRow();
+  clearSelectionSoon();
   openModal('detailModal');
 }
 // Zähler (nur Textfelder): zeigt, wie oft das Feld geschafft wurde; + auf einem unmarkierten Feld markiert es (= 1).
@@ -73,4 +87,6 @@ let LONGPRESS_MS = 550;
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => board.addEventListener(type, cancel));
   board.addEventListener('click', e => { if (fired) { fired = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   board.addEventListener('contextmenu', e => e.preventDefault());
+  // Der Finger wird meist über dem schon geöffneten Dialog losgelassen: nach einem langen Drücken die Auswahl wegräumen
+  ['pointerup', 'pointercancel'].forEach(type => document.addEventListener(type, () => { if (fired) { clearSelection(); setTimeout(clearSelection, 80); } }, true));
 })();

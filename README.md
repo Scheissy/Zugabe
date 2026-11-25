@@ -46,6 +46,8 @@ Zu jedem Feld lässt sich ein Datum (wann geschafft) und ein Info-Text (z. B. wo
   Settings → „Datum automatisch eintragen“ schaltet das ab. Ein eigenes Datum wird nie überschrieben.
 - **Bearbeiten:** Feld lang drücken oder in der Lupe „Datum & Info ergänzen/bearbeiten“. Im Dialog: Datumsfeld, „Heute“, „Entfernen“ und ein Info-Text (bis 200 Zeichen). Alles wird sofort gespeichert.
 - **Anzeige:** Die Lupe zeigt Datum und Info zum angetippten Feld; ein kleiner goldener Punkt auf dem Feld zeigt, dass eine Info vorhanden ist.
+- Beim langen Drücken startet Android zusätzlich seine eigene Textauswahl. Dagegen ist im Dialog die Textauswahl abgeschaltet (Eingabefelder ausgenommen),
+  und eine angefangene Auswahl wird beim Öffnen und Loslassen weggeräumt.
 - Entmarkieren löscht Datum und Info nicht. „Markierungen löschen“ und „Neue Karte“ setzen sie zurück (mit Rückfrage, auch wenn nur eine Info vorhanden ist).
 - Das Freifeld hat keine Details.
 

@@ -11,7 +11,8 @@
   "test/test_details.js",
   "test/test_sicherung.js",
   "test/test_fest.js",
-  "test/test_zaehler.js"
+  "test/test_zaehler.js",
+  "test/test_auswahl.js"
  ],
  "mutations": [
   {
@@ -607,6 +608,42 @@
    "file": "js/07-details.js",
    "old": "document.getElementById('countPlus').disabled = n >= MAX_COUNT;",
    "new": "document.getElementById('countPlus').disabled = false;"
+  },
+  {
+   "name": "S1 Dialog erlaubt Textauswahl",
+   "file": "css/app.css",
+   "old": "padding-bottom: var(--safe-bottom); -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }",
+   "new": "padding-bottom: var(--safe-bottom); }"
+  },
+  {
+   "name": "S2 Auswahl wird beim Öffnen nicht weggeräumt",
+   "file": "js/07-details.js",
+   "old": "  clearSelectionSoon();\n  openModal('detailModal');",
+   "new": "  openModal('detailModal');"
+  },
+  {
+   "name": "S3 Auswahl wird nach dem Loslassen nicht weggeräumt",
+   "file": "js/07-details.js",
+   "old": "{ if (fired) { clearSelection(); setTimeout(clearSelection, 80); } }",
+   "new": "{ }"
+  },
+  {
+   "name": "S4 Auswahl im Eingabefeld wird mit weggeräumt",
+   "file": "js/07-details.js",
+   "old": "!(ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName))",
+   "new": "true"
+  },
+  {
+   "name": "S5 Spätere Auswahl wird nicht weggeräumt",
+   "file": "js/07-details.js",
+   "old": "  [150, 700].forEach(ms => setTimeout(clearSelection, ms));",
+   "new": ""
+  },
+  {
+   "name": "S6 Eingabefelder im Dialog nicht mehr auswählbar",
+   "file": "css/app.css",
+   "old": ".modal input, .modal textarea { -webkit-user-select: text; user-select: text; }",
+   "new": ".modal input, .modal textarea { }"
   }
  ]
 }
