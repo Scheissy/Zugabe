@@ -49,6 +49,17 @@ Zu jedem Feld lässt sich ein Datum (wann geschafft) und ein Info-Text (z. B. wo
 - Entmarkieren löscht Datum und Info nicht. „Markierungen löschen“ und „Neue Karte“ setzen sie zurück (mit Rückfrage, auch wenn nur eine Info vorhanden ist).
 - Das Freifeld hat keine Details.
 
+### Zähler (Felder mehrfach werten)
+
+Ein Textfeld kann mehrfach „geschafft“ werden. Das Antippen des Felds zählt als **1**; hochgezählt wird im Dialog „Datum & Info“ (Feld lang drücken oder in der Lupe)
+mit − und ＋ in der Zeile „Anzahl“ (1 bis 99).
+
+- Ab 2 zeigt das Feld unten rechts „×N“, die Lupe nennt „markiert · N×“. Auf einem unmarkierten Feld markiert ＋ das Feld (= 1, mit automatischem Datum).
+- Das Antippen eines Felds mit Zähler über 1 fragt vor dem Entmarkieren nach, weil die Zählung dabei verloren geht. Bei Zählerstand 1 geht es wie bisher direkt.
+- Ein Feld zählt für Linie und Vollbild und für den Zähler „x von y Feldern“ unabhängig vom Zählerstand einfach als markiert.
+- Weitere Zählungen haben vorerst kein eigenes Datum und keine eigene Info. Kombi-Felder (Multi-Select) haben vorerst keinen Zähler.
+- Der Zähler steckt in der Sicherung (Export/Import) und wird dort wie alles andere geprüft und bereinigt.
+
 ### Sicherung (Export und Import)
 
 Settings → „Sicherung“: Alle Spielstände lassen sich in einer Datei sichern (`zugabe-sicherung-<Datum>.json`) und wieder einlesen,

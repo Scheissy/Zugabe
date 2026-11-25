@@ -8,6 +8,7 @@ const MAX_KURZ = 20;          // empfohlene Höchstlänge eines Kurztextes auf d
 const ZIELE = ['linie', 'vollbild'];
 const MAX_FELD_LEN = 80;
 const MAX_INFO = 200;           // Länge des Info-Texts zu einem Feld
+const MAX_COUNT = 99;           // höchster Zählerstand eines Felds (wie oft es "geschafft" wurde)
 
 // Datum als "JJJJ-MM-TT" (lokale Zeit) - so speichert auch das Datumsfeld.
 function todayStr() {

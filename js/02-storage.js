@@ -8,7 +8,8 @@ const DEFAULT_SETTINGS = { confirmNewCard: true, showCounter: true, useKurz: tru
 // cards[gameId] = { seed, cells: [Text | Kombi-Feld { t, p, ab } | null (Freifeld)], marks: [Positionen von Textfeldern],
 //                    checks: { Position: [Nummern der abgehakten Punkte] },
 //                    eigene: { Position: [selbst eingetragene Texte] } (nur Kombi-Felder mit e: true),
-//                    details: { Position: { d: 'JJJJ-MM-TT', i: 'Info' } } (beides optional) }
+//                    details: { Position: { d: 'JJJJ-MM-TT', i: 'Info' } } (beides optional),
+//                    counts: { Position: Anzahl 2..99 } (nur markierte Textfelder; 1 = Normalfall, nicht gespeichert) }
 // Die Feldtexte werden mitgespeichert: eine laufende Karte bleibt auch dann gleich, wenn bingo-data.js geändert wird.
 let appState = { cards: {}, settings: { ...DEFAULT_SETTINGS }, activeGame: '' };
 let stateVersion = 0;
@@ -77,7 +78,15 @@ function sanitizeCard(game, raw) {
     if (info) out.i = info;
     if (out.d || out.i) details[p] = out;
   });
-  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene, details: details };
+  // Zähler (wie oft ein Textfeld geschafft wurde): nur für markierte Textfelder, Werte 2 bis MAX_COUNT (1 ist der Normalfall und wird nicht gespeichert).
+  const counts = {};
+  const rcn = raw.counts && typeof raw.counts === 'object' && !Array.isArray(raw.counts) ? raw.counts : {};
+  Object.keys(rcn).forEach(k => {
+    const p = Number(k), n = rcn[k];
+    if (!Number.isInteger(p) || String(p) !== k || p < 0 || p >= total || typeof cells[p] !== 'string' || !marks.includes(p) || !Number.isInteger(n) || n < 2 || n > MAX_COUNT) return;
+    counts[p] = n;
+  });
+  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene, details: details, counts: counts };
 }
 
 // Macht aus gespeicherten oder importierten Einstellungen gültige: falsche Typen und unbekannte Werte fallen auf den Standard.

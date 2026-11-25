@@ -15,7 +15,31 @@ function openDetails(p) {
   document.getElementById('detailDate').value = det.d || '';
   document.getElementById('detailInfo').value = det.i || '';
   renderLupe();
+  renderCountRow();
   openModal('detailModal');
+}
+// Zähler (nur Textfelder): zeigt, wie oft das Feld geschafft wurde; + auf einem unmarkierten Feld markiert es (= 1).
+function renderCountRow() {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[detailPos];
+  const row = document.getElementById('detailCountRow');
+  const show = typeof c === 'string';
+  row.style.display = show ? '' : 'none';
+  if (!show) return;
+  const n = countOf(card, detailPos);
+  document.getElementById('countVal').textContent = String(n);
+  document.getElementById('countMinus').disabled = n <= 1;
+  document.getElementById('countPlus').disabled = n >= MAX_COUNT;
+}
+function countStep(dir) {
+  const card = appState.cards[appState.activeGame];
+  if (!card) return;
+  const r = setCount(appState.activeGame, detailPos, countOf(card, detailPos) + dir);
+  if (!r.changed) return;
+  document.getElementById('detailDate').value = (detailsOf(card, detailPos) || {}).d || '';   // Datum kann beim Markieren automatisch gesetzt worden sein
+  renderBoard();
+  renderCountRow();
+  if (r.justWon) showToast('Bingo!');
 }
 function afterDetailChange(r) { if (r.changed) renderBoard(); }   // zeichnet auch die Lupe neu
 function onDetailDate(v) { afterDetailChange(setDetail(appState.activeGame, detailPos, { d: v })); }

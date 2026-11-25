@@ -121,13 +121,26 @@ function renderBoard() {
     }
     const m = card.marks.includes(p);
     const lab = displayText(appState.settings.useKurz && kurzOf(game, c) || c);
-    const full = lab !== displayText(c) ? ` aria-label="${esc(c)}" title="${esc(c)}"` : '';
-    return `<button type="button" class="cell n${n}${lab !== displayText(c) ? ' kurz' : ''}${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}" data-p="${p}"${full} aria-pressed="${m}" onclick="onCell(${p})">${esc(lab)}</button>`;
+    const cnt = countOf(card, p);
+    const ariaText = esc(c) + (cnt > 1 ? ', ' + cnt + ' mal' : '');
+    const full = lab !== displayText(c) ? ` aria-label="${ariaText}" title="${esc(c)}"` : (cnt > 1 ? ` aria-label="${ariaText}"` : '');
+    return `<button type="button" class="cell n${n}${lab !== displayText(c) ? ' kurz' : ''}${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}" data-p="${p}"${cnt > 1 ? ` data-n="${cnt}"` : ''}${full} aria-pressed="${m}" onclick="onCell(${p})">${esc(lab)}</button>`;
   }).join('');
   renderLupe();
   fitBoard();
 }
 function onCell(p) {
+  const card = appState.cards[appState.activeGame];
+  const n = card ? countOf(card, p) : 0;
+  if (n > 1) {   // Entmarkieren würde die Zählung löschen: vorher nachfragen
+    lupePos = p;
+    askConfirm('Markierung entfernen?', `Dieses Feld wurde ${n}× gezählt. Beim Entfernen der Markierung geht die Zählung verloren.`, 'Entfernen', () => toggleCell(p));
+    renderLupe();
+    return;
+  }
+  toggleCell(p);
+}
+function toggleCell(p) {
   lupePos = p;
   const r = toggleMark(appState.activeGame, p);
   if (!r.changed) { renderLupe(); return; }
@@ -153,7 +166,7 @@ function renderLupe() {
   const c = lupePos >= 0 ? card.cells[lupePos] : null;
   if (c === null || c === undefined) { el.innerHTML = '<small>Tippe ein Feld an, um den ganzen Text hier zu lesen. Lang drücken: Datum &amp; Info.</small>'; return; }
   const full = isComboEntry(c) ? c.t : c;
-  const meta = isComboEntry(c) ? `☑ ${comboCount(card, lupePos)}/${c.ab}` : (card.marks.includes(lupePos) ? 'markiert' : 'nicht markiert');
+  const meta = isComboEntry(c) ? `☑ ${comboCount(card, lupePos)}/${c.ab}` : (card.marks.includes(lupePos) ? 'markiert' + (countOf(card, lupePos) > 1 ? ' · ' + countOf(card, lupePos) + '×' : '') : 'nicht markiert');
   const det = detailsOf(card, lupePos);
   el.innerHTML = `<span class="lupe-text">${esc(full)}</span><small>${esc(meta)}</small>`
     + (det && det.d ? `<span class="lupe-detail">Datum: ${esc(formatDate(det.d))}</span>` : '')

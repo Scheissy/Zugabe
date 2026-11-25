@@ -61,6 +61,15 @@
 <button class="modal-close" onclick="closeModal('detailModal')" aria-label="Schließen">✕</button>
 </div>
 <div class="modal-body">
+<div class="detail-count" id="detailCountRow">
+<span class="detail-label">Anzahl</span>
+<div class="count-stepper">
+<button type="button" class="zoom-btn" id="countMinus" onclick="countStep(-1)" aria-label="Anzahl verringern">−</button>
+<span class="count-val" id="countVal" aria-live="polite">0</span>
+<button type="button" class="zoom-btn" id="countPlus" onclick="countStep(1)" aria-label="Anzahl erhöhen">＋</button>
+</div>
+<div class="detail-hint">Antippen des Felds zählt als 1. Für jedes weitere Mal hier hochzählen.</div>
+</div>
 <label class="detail-label" for="detailDate">Datum</label>
 <div class="detail-date-row">
 <input type="date" id="detailDate" class="detail-input" onchange="onDetailDate(this.value)">

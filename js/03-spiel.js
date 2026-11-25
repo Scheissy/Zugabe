@@ -19,7 +19,7 @@ function createCard(game, seed) {
     const f = game.felder[pool[k++]];
     cells.push(isComboEntry(f) ? comboCell(f) : f);
   }
-  return { seed: seed, cells: cells, marks: [], checks: {}, eigene: {}, details: {} };
+  return { seed: seed, cells: cells, marks: [], checks: {}, eigene: {}, details: {}, counts: {} };
 }
 
 // Zelle aus einem Kombi-Feld der Daten: e = eigene Einträge erlaubt, h = Platzhalter für das Eingabefeld.
@@ -91,6 +91,11 @@ function startGame(id) {
 
 // Datum und Info eines Felds (oder null).
 function detailsOf(card, p) { return (card.details && card.details[p]) || null; }
+// Zählerstand eines Textfelds: 0 = nicht markiert, 1 = einmal (Antippen), mehr = Zähler. Kombi-Felder haben keinen Zähler (0).
+function countOf(card, p) {
+  if (typeof card.cells[p] !== 'string' || !card.marks.includes(p)) return 0;
+  return (card.counts && card.counts[p]) || 1;
+}
 function hasInfo(card, p) { const d = detailsOf(card, p); return !!(d && d.i); }
 
 // Führt eine Änderung an Feld p aus und meldet, ob dadurch gerade ein Gewinn entstanden ist.
@@ -120,7 +125,7 @@ function toggleMark(id, p) {
   }
   return applyChange(game, card, () => {
     const i = card.marks.indexOf(p);
-    if (i >= 0) card.marks.splice(i, 1); else { card.marks.push(p); card.marks.sort((a, b) => a - b); }
+    if (i >= 0) { card.marks.splice(i, 1); if (card.counts) delete card.counts[p]; } else { card.marks.push(p); card.marks.sort((a, b) => a - b); }
   }, p);
 }
 
@@ -174,6 +179,21 @@ function setDetail(id, p, patch) {
   return { changed: true };
 }
 
+// Zähler eines Textfelds setzen (1 bis MAX_COUNT): wie oft das Feld "geschafft" wurde. Das Antippen des Felds entspricht 1.
+// Auf einem noch nicht markierten Feld markiert das Feld (und trägt ggf. das Datum ein). Kombi-Felder haben keinen Zähler.
+function setCount(id, p, n) {
+  const none = { changed: false, won: false, justWon: false };
+  const game = gameById(id);
+  const card = appState.cards[id];
+  if (!game || !card || !Number.isInteger(p) || p < 0 || p >= card.cells.length || typeof card.cells[p] !== 'string' || !Number.isInteger(n) || n < 1 || n > MAX_COUNT) return none;
+  if (countOf(card, p) === n) return none;
+  return applyChange(game, card, () => {
+    if (!card.marks.includes(p)) { card.marks.push(p); card.marks.sort((a, b) => a - b); }
+    card.counts = card.counts || {};
+    if (n > 1) card.counts[p] = n; else delete card.counts[p];
+  }, p);
+}
+
 function newCardFor(id) {
   const game = gameById(id);
   if (!game) return null;
@@ -191,6 +211,7 @@ function resetMarks(id) {
   card.checks = {};
   card.eigene = {};
   card.details = {};
+  card.counts = {};
   saveToStorage();
 }
 function resetAllCards() {

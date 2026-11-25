@@ -10,7 +10,8 @@
   "test/test_fit.js",
   "test/test_details.js",
   "test/test_sicherung.js",
-  "test/test_fest.js"
+  "test/test_fest.js",
+  "test/test_zaehler.js"
  ],
  "mutations": [
   {
@@ -208,8 +209,8 @@
   {
    "name": "L3 aria-label/Tooltip nicht maskiert",
    "file": "js/04-ansicht.js",
-   "old": "const full = lab !== displayText(c) ? ` aria-label=\"${esc(c)}\" title=\"${esc(c)}\"` : '';",
-   "new": "const full = lab !== displayText(c) ? ` aria-label=\"${c}\" title=\"${c}\"` : '';"
+   "old": "const ariaText = esc(c) + (cnt > 1",
+   "new": "const ariaText = c + (cnt > 1"
   },
   {
    "name": "L4 Lupe automatisch nur bei Kurztexten (nicht ab 7×7)",
@@ -540,6 +541,72 @@
    "file": "js/01-data.js",
    "old": "if (g.fest !== undefined && typeof g.fest !== 'boolean') add(id, 'fehler', 'fest muss true oder false sein');",
    "new": ""
+  },
+  {
+   "name": "C1 Entmarkieren löscht den Zähler nicht",
+   "file": "js/03-spiel.js",
+   "old": "{ card.marks.splice(i, 1); if (card.counts) delete card.counts[p]; }",
+   "new": "{ card.marks.splice(i, 1); }"
+  },
+  {
+   "name": "C2 Zähler über 99 erlaubt",
+   "file": "js/03-spiel.js",
+   "old": "|| n < 1 || n > MAX_COUNT) return none;",
+   "new": "|| n < 1) return none;"
+  },
+  {
+   "name": "C3 Kombi-Felder bekommen einen Zähler",
+   "file": "js/03-spiel.js",
+   "old": "|| typeof card.cells[p] !== 'string' || !Number.isInteger(n)",
+   "new": "|| card.cells[p] === null || !Number.isInteger(n)"
+  },
+  {
+   "name": "C4 Zählerstand 1 wird gespeichert",
+   "file": "js/03-spiel.js",
+   "old": "if (n > 1) card.counts[p] = n; else delete card.counts[p];\n  }, p);\n}\n\nfunction newCardFor",
+   "new": "card.counts[p] = n;\n  }, p);\n}\n\nfunction newCardFor"
+  },
+  {
+   "name": "C5 Zähler bei unmarkierten Feldern bleiben beim Laden",
+   "file": "js/02-storage.js",
+   "old": " || !marks.includes(p) || !Number.isInteger(n) || n < 2",
+   "new": " || !Number.isInteger(n) || n < 2"
+  },
+  {
+   "name": "C6 Zurücksetzen lässt Zähler stehen",
+   "file": "js/03-spiel.js",
+   "old": "  card.details = {};\n  card.counts = {};\n",
+   "new": "  card.details = {};\n"
+  },
+  {
+   "name": "C7 Entmarkieren ohne Rückfrage trotz Zähler",
+   "file": "js/04-ansicht.js",
+   "old": "  if (n > 1) {   // Entmarkieren würde die Zählung löschen",
+   "new": "  if (false) {   // Entmarkieren würde die Zählung löschen"
+  },
+  {
+   "name": "C8 Zähler-Zeile auch bei Kombi-Feldern sichtbar",
+   "file": "js/07-details.js",
+   "old": "const show = typeof c === 'string';",
+   "new": "const show = c !== null && c !== undefined;"
+  },
+  {
+   "name": "C9 Zählerhinweis fehlt auf dem Feld",
+   "file": "js/04-ansicht.js",
+   "old": "${cnt > 1 ? ` data-n=\"${cnt}\"` : ''}",
+   "new": ""
+  },
+  {
+   "name": "C10 Dialog-Datum nach dem Markieren per Plus nicht aktualisiert",
+   "file": "js/07-details.js",
+   "old": "  document.getElementById('detailDate').value = (detailsOf(card, detailPos) || {}).d || '';   // Datum kann beim Markieren automatisch gesetzt worden sein\n",
+   "new": ""
+  },
+  {
+   "name": "C11 Plus bei Maximum nicht gesperrt",
+   "file": "js/07-details.js",
+   "old": "document.getElementById('countPlus').disabled = n >= MAX_COUNT;",
+   "new": "document.getElementById('countPlus').disabled = false;"
   }
  ]
 }
