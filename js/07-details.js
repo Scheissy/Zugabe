@@ -37,7 +37,7 @@ function renderCountRow() {
   const card = appState.cards[appState.activeGame];
   const c = card && card.cells[detailPos];
   const row = document.getElementById('detailCountRow');
-  const show = typeof c === 'string';
+  const show = typeof c === 'string' && zaehlerAn();
   row.style.display = show ? '' : 'none';
   if (!show) return;
   const n = countOf(card, detailPos);
@@ -47,7 +47,7 @@ function renderCountRow() {
 }
 function countStep(dir) {
   const card = appState.cards[appState.activeGame];
-  if (!card) return;
+  if (!card || !zaehlerAn()) return;
   const r = setCount(appState.activeGame, detailPos, countOf(card, detailPos) + dir);
   if (!r.changed) return;
   document.getElementById('detailDate').value = (detailsOf(card, detailPos) || {}).d || '';   // Datum kann beim Markieren automatisch gesetzt worden sein

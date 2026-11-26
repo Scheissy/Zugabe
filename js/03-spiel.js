@@ -92,6 +92,8 @@ function startGame(id) {
 // Datum und Info eines Felds (oder null).
 function detailsOf(card, p) { return (card.details && card.details[p]) || null; }
 // Zählerstand eines Textfelds: 0 = nicht markiert, 1 = einmal (Antippen), mehr = Zähler. Kombi-Felder haben keinen Zähler (0).
+// Ist der Zähler in den Settings eingeschaltet? (Aus = Zählerstände werden nicht angezeigt und nicht verändert.)
+function zaehlerAn() { return appState.settings.zaehler !== false; }
 function countOf(card, p) {
   if (typeof card.cells[p] !== 'string' || !card.marks.includes(p)) return 0;
   return (card.counts && card.counts[p]) || 1;
@@ -185,7 +187,7 @@ function setCount(id, p, n) {
   const none = { changed: false, won: false, justWon: false };
   const game = gameById(id);
   const card = appState.cards[id];
-  if (!game || !card || !Number.isInteger(p) || p < 0 || p >= card.cells.length || typeof card.cells[p] !== 'string' || !Number.isInteger(n) || n < 1 || n > MAX_COUNT) return none;
+  if (!zaehlerAn() || !game || !card || !Number.isInteger(p) || p < 0 || p >= card.cells.length || typeof card.cells[p] !== 'string' || !Number.isInteger(n) || n < 1 || n > MAX_COUNT) return none;
   if (countOf(card, p) === n) return none;
   return applyChange(game, card, () => {
     if (!card.marks.includes(p)) { card.marks.push(p); card.marks.sort((a, b) => a - b); }

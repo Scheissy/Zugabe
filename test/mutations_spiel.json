@@ -588,8 +588,8 @@
   {
    "name": "C8 Zähler-Zeile auch bei Kombi-Feldern sichtbar",
    "file": "js/07-details.js",
-   "old": "const show = typeof c === 'string';",
-   "new": "const show = c !== null && c !== undefined;"
+   "old": "const show = typeof c === 'string' && zaehlerAn();",
+   "new": "const show = c !== null && c !== undefined && zaehlerAn();"
   },
   {
    "name": "C9 Zählerhinweis fehlt auf dem Feld",
@@ -644,6 +644,48 @@
    "file": "css/app.css",
    "old": ".modal input, .modal textarea { -webkit-user-select: text; user-select: text; }",
    "new": ".modal input, .modal textarea { }"
+  },
+  {
+   "name": "Q1 Zeile 'Anzahl' ignoriert die Einstellung",
+   "file": "js/07-details.js",
+   "old": "const show = typeof c === 'string' && zaehlerAn();",
+   "new": "const show = typeof c === 'string';"
+  },
+  {
+   "name": "Q2 Zählerhinweis auf dem Feld trotz 'Zähler aus'",
+   "file": "js/04-ansicht.js",
+   "old": "const cnt = zaehlerAn() ? countOf(card, p) : 0;",
+   "new": "const cnt = countOf(card, p);"
+  },
+  {
+   "name": "Q3 Zahl in der Lupe trotz 'Zähler aus'",
+   "file": "js/04-ansicht.js",
+   "old": "(zaehlerAn() && countOf(card, lupePos) > 1",
+   "new": "(countOf(card, lupePos) > 1"
+  },
+  {
+   "name": "Q4 Rückfrage beim Entmarkieren trotz 'Zähler aus'",
+   "file": "js/04-ansicht.js",
+   "old": "const n = card && zaehlerAn() ? countOf(card, p) : 0;",
+   "new": "const n = card ? countOf(card, p) : 0;"
+  },
+  {
+   "name": "Q5 setCount wirkt trotz 'Zähler aus'",
+   "file": "js/03-spiel.js",
+   "old": "  if (!zaehlerAn() || !game ||",
+   "new": "  if (!game ||"
+  },
+  {
+   "name": "Q6 Einstellung 'Zähler' wird nicht geprüft",
+   "file": "js/02-storage.js",
+   "old": "zaehler: bool('zaehler'),",
+   "new": "zaehler: s.zaehler,"
+  },
+  {
+   "name": "Q7 Zähler ist standardmäßig aus",
+   "file": "js/02-storage.js",
+   "old": "autoDatum: true, zaehler: true, lupe: 'auto' };",
+   "new": "autoDatum: true, zaehler: false, lupe: 'auto' };"
   }
  ]
 }

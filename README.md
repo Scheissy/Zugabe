@@ -61,6 +61,9 @@ mit − und ＋ in der Zeile „Anzahl“ (1 bis 99).
 - Ein Feld zählt für Linie und Vollbild und für den Zähler „x von y Feldern“ unabhängig vom Zählerstand einfach als markiert.
 - Weitere Zählungen haben vorerst kein eigenes Datum und keine eigene Info. Kombi-Felder (Multi-Select) haben vorerst keinen Zähler.
 - Der Zähler steckt in der Sicherung (Export/Import) und wird dort wie alles andere geprüft und bereinigt.
+- **Abschaltbar:** Settings → „Zähler (Felder mehrfach zählen)“ (Standard: an). Aus = keine Zeile „Anzahl“ im Dialog, kein „×N“ auf den Feldern, keine Zahl in der Lupe
+  und keine Rückfrage beim Entmarkieren. Bereits gespeicherte Zählerstände bleiben erhalten und erscheinen wieder, wenn der Zähler wieder an ist; sie lassen sich bei
+  ausgeschaltetem Zähler nicht ändern. Entmarkiert man ein Feld, geht seine Zählung wie immer verloren.
 
 ### Sicherung (Export und Import)
 

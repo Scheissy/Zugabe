@@ -9,6 +9,7 @@ function applySettingsUI() {
   document.getElementById('settingUseKurz').checked = appState.settings.useKurz;
   document.getElementById('settingIcons').checked = appState.settings.icons;
   document.getElementById('settingAutoDatum').checked = appState.settings.autoDatum;
+  document.getElementById('settingZaehler').checked = appState.settings.zaehler;
   document.getElementById('settingLupe').value = appState.settings.lupe;
 }
 function toggleSetting(key, value) {
