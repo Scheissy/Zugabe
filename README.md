@@ -123,6 +123,8 @@ Mit `eigene: true` kann man zusätzlich zu den festen Punkten eigene Einträge e
 - Im Dialog stehen unter den festen Punkten Eingabefelder. Nach jedem ausgefüllten Feld erscheint ein neues leeres (höchstens 10 Einträge à 40 Zeichen)
 - Jeder Eintrag zählt wie ein abgehakter Punkt. Doppelte Einträge und Einträge, die einem festen Punkt gleichen, zählen nur einmal (gestrichelter Rand)
 - `eigeneHinweis` ist der Platzhaltertext im Eingabefeld (optional)
+- Im Dialog stehen die eigenen Einträge als Zeilen in derselben Liste wie die festen Punkte: Häkchen links (nur Anzeige, gesetzt, sobald der Eintrag zählt) und der Text
+  als Eingabefeld ohne Rahmen. Doppelte Einträge werden abgeblendet und durchgestrichen (Häkchen aus).
 - Mit `eigene: true` darf `punkte` auch weniger als 2 Einträge haben (oder leer sein) und `ab` darf bis `punkte + 10` gehen
 
 ## Neue Datei hinzufügen

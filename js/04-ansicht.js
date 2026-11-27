@@ -194,6 +194,7 @@ function openCombo(p) {
     `<label class="combo-row"><input type="checkbox" data-i="${i}"${checked.includes(i) ? ' checked' : ''} onchange="onComboCheck(${i}, this.checked)"><span>${esc(name)}</span></label>`).join('');
   // Eigene Einträge: gespeicherte Texte, danach immer ein leeres Feld für den nächsten
   document.getElementById('comboOwn').style.display = c.e ? '' : 'none';
+  document.getElementById('comboList').classList.toggle('has-own', !!c.e);
   document.getElementById('comboOwnList').innerHTML = '';
   if (c.e) { eigeneList(card, p).forEach(v => addOwnInput(v)); fillTrailingInput(); }
   updateComboProgress();
@@ -203,6 +204,14 @@ function ownInputs() { return [...document.querySelectorAll('#comboOwnList .comb
 function ownValues() { return ownInputs().map(i => i.value); }
 function addOwnInput(value) {
   const cur = currentCombo();
+  // Zeile wie bei den festen Punkten: Häkchen links (zeigt nur, ob der Eintrag zählt) und der Text als Eingabefeld
+  const row = document.createElement('div');
+  row.className = 'combo-row combo-own-row';
+  const check = document.createElement('input');
+  check.type = 'checkbox';
+  check.className = 'combo-own-check';
+  check.tabIndex = -1;
+  check.setAttribute('aria-hidden', 'true');
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'combo-own-input';
@@ -213,13 +222,16 @@ function addOwnInput(value) {
   input.setAttribute('oninput', 'onOwnInput()');
   input.setAttribute('onchange', 'onOwnChange()');
   input.value = value || '';
-  document.getElementById('comboOwnList').appendChild(input);
+  row.addEventListener('click', e => { if (e.target !== input) input.focus(); });
+  row.appendChild(check);
+  row.appendChild(input);
+  document.getElementById('comboOwnList').appendChild(row);
 }
 // Es gibt immer genau ein leeres Feld am Ende - bis MAX_EIGENE Felder erreicht sind.
 function fillTrailingInput() {
   let inputs = ownInputs();
   while (inputs.length > 1 && !inputs[inputs.length - 1].value.trim() && !inputs[inputs.length - 2].value.trim()) {
-    inputs[inputs.length - 1].remove();
+    inputs[inputs.length - 1].parentNode.remove();
     inputs = ownInputs();
   }
   if (!inputs.length || (inputs[inputs.length - 1].value.trim() && inputs.length < MAX_EIGENE)) addOwnInput('');
@@ -240,6 +252,9 @@ function updateComboProgress() {
     ownInputs().forEach(inp => {
       const key = normEintrag(inp.value);
       inp.classList.toggle('dup', !!key && seen.has(key));
+      const chk = inp.parentNode.querySelector('.combo-own-check');
+      if (chk) chk.checked = !!key && !inp.classList.contains('dup');   // Häkchen = der Eintrag zählt
+      inp.title = inp.classList.contains('dup') ? 'Zählt nicht doppelt' : '';
       if (key) seen.add(key);
     });
   }
@@ -264,7 +279,7 @@ function onOwnInput() {
 // Feld verlassen: leere Felder mitten in der Liste aufräumen (das Feld mit dem Fokus bleibt).
 function onOwnChange() {
   const inputs = ownInputs();
-  inputs.forEach((el, i) => { if (!el.value.trim() && i < inputs.length - 1 && el !== document.activeElement) el.remove(); });
+  inputs.forEach((el, i) => { if (!el.value.trim() && i < inputs.length - 1 && el !== document.activeElement) el.parentNode.remove(); });
   fillTrailingInput();
   updateComboProgress();
 }

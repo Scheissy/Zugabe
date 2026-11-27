@@ -13,7 +13,8 @@
   "test/test_fest.js",
   "test/test_zaehler.js",
   "test/test_auswahl.js",
-  "test/test_umstellung.js"
+  "test/test_umstellung.js",
+  "test/test_eigene_zeilen.js"
  ],
  "mutations": [
   {
@@ -717,6 +718,54 @@
    "file": "js/08-sicherung.js",
    "old": "notes: r.card ? r.notes : [], card: r.card,",
    "new": "notes: [], card: r.card,"
+  },
+  {
+   "name": "R1 Häkchen der eigenen Zeile zeigt nicht, ob der Eintrag zählt",
+   "file": "js/04-ansicht.js",
+   "old": "      if (chk) chk.checked = !!key && !inp.classList.contains('dup');   // Häkchen = der Eintrag zählt\n",
+   "new": ""
+  },
+  {
+   "name": "R2 Beim Aufräumen bleibt das Häkchen der Zeile stehen",
+   "file": "js/04-ansicht.js",
+   "old": "    inputs[inputs.length - 1].parentNode.remove();",
+   "new": "    inputs[inputs.length - 1].remove();"
+  },
+  {
+   "name": "R3 Linie zwischen festen und eigenen Zeilen fehlt (has-own)",
+   "file": "js/04-ansicht.js",
+   "old": "  document.getElementById('comboList').classList.toggle('has-own', !!c.e);\n",
+   "new": ""
+  },
+  {
+   "name": "R4 Tipp auf die Zeile setzt den Cursor nicht ins Feld",
+   "file": "js/04-ansicht.js",
+   "old": "  row.addEventListener('click', e => { if (e.target !== input) input.focus(); });\n",
+   "new": ""
+  },
+  {
+   "name": "R5 Doppelter Eintrag ohne Hinweis im Tooltip",
+   "file": "js/04-ansicht.js",
+   "old": "      inp.title = inp.classList.contains('dup') ? 'Zählt nicht doppelt' : '';\n",
+   "new": ""
+  },
+  {
+   "name": "R6 Eingabefeld wieder als Kasten (Rahmen)",
+   "file": "css/app.css",
+   "old": "background: none; border: none; border-radius: 0;",
+   "new": "background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;"
+  },
+  {
+   "name": "R7 Häkchen der eigenen Zeile antippbar",
+   "file": "css/app.css",
+   "old": ".combo-own-check { pointer-events: none; }",
+   "new": ".combo-own-check { }"
+  },
+  {
+   "name": "R8 Aufräumen beim Verlassen lässt die Zeile stehen",
+   "file": "js/04-ansicht.js",
+   "old": "el !== document.activeElement) el.parentNode.remove(); });",
+   "new": "el !== document.activeElement) el.remove(); });"
   }
  ]
 }
