@@ -67,12 +67,15 @@ function sameCombo(cell, f) {
 // unverändert sein (sonst passen die Häkchen nicht mehr), kein Feld darf doppelt vorkommen.
 function checkImportedCard(game, entry) {
   const problems = [];
-  if (!entry || typeof entry !== 'object' || !entry.karte) return { card: null, problems: ['Der Eintrag enthält keine Karte.'] };
+  if (!entry || typeof entry !== 'object' || !entry.karte) return { card: null, problems: ['Der Eintrag enthält keine Karte.'], notes: [] };
   if (entry.groesse !== undefined && entry.groesse !== game.groesse) {
     problems.push('Die Kartengröße passt nicht (Sicherung ' + entry.groesse + '×' + entry.groesse + ', Spiel ' + game.groesse + '×' + game.groesse + ').');
   }
   const card = sanitizeCard(game, entry.karte);
-  if (!card) { problems.push('Die Karte passt nicht zum Spiel (Größe oder Freifeld).'); return { card: null, problems: problems }; }
+  if (!card) { problems.push('Die Karte passt nicht zum Spiel (Größe oder Freifeld).'); return { card: null, problems: problems, notes: [] }; }
+  // Textfelder, die im Spiel inzwischen Kombi-Felder sind, werden umgestellt (mit Hinweis) statt abgelehnt
+  const migrated = migrateCombos(game, card);
+  const notes = migrated.map(m => '„' + m.text + '“ ist jetzt ein Kombi-Feld (Häkchen pro Punkt)' + (m.wasMarked ? '; die frühere einfache Markierung wurde zurückgesetzt.' : '.'));
   const plain = new Set(), combos = new Map();
   game.felder.forEach(f => { if (isComboEntry(f)) combos.set(String(f.text).slice(0, MAX_FELD_LEN), f); else plain.add(String(f).slice(0, MAX_FELD_LEN)); });
   const seen = new Set(), missing = [], changed = [], dups = [];
@@ -90,7 +93,7 @@ function checkImportedCard(game, entry) {
   if (missing.length) problems.push(missing.length + (missing.length === 1 ? ' Feld ist' : ' Felder sind') + ' im Spiel nicht vorhanden: ' + list(missing));
   if (changed.length) problems.push('Kombi-Feld hat sich im Spiel geändert: ' + list(changed));
   if (dups.length) problems.push('Ein Feld kommt mehrfach auf der Karte vor: ' + list(dups));
-  return { card: problems.length ? null : card, problems: problems };
+  return { card: problems.length ? null : card, problems: problems, notes: notes };
 }
 
 // Prüft die ganze Sicherung. Jedes Spiel einzeln: status 'ok' (importierbar) oder 'fehler' (mit Gründen).
@@ -99,10 +102,10 @@ function analyzeBackup(backup) {
     const entry = backup.spiele[id];
     const game = /^[a-z0-9-]+$/.test(id) ? gameById(id) : null;
     const titel = game ? game.titel : String(entry && typeof entry.titel === 'string' ? entry.titel : id).slice(0, 60);
-    if (!game) return { id: id, titel: titel, status: 'fehler', problems: ['Dieses Spiel gibt es in der App nicht (mehr) oder es ist fehlerhaft.'], card: null, existing: null };
+    if (!game) return { id: id, titel: titel, status: 'fehler', problems: ['Dieses Spiel gibt es in der App nicht (mehr) oder es ist fehlerhaft.'], notes: [], card: null, existing: null };
     const r = checkImportedCard(game, entry);
     const cur = appState.cards[id];
-    return { id: id, titel: titel, status: r.card ? 'ok' : 'fehler', problems: r.problems, card: r.card,
+    return { id: id, titel: titel, status: r.card ? 'ok' : 'fehler', problems: r.problems, notes: r.card ? r.notes : [], card: r.card,
       existing: cur && Array.isArray(cur.cells) ? { markiert: markedCount(cur), felder: fieldCount(cur) } : null };
   });
   return { games: games, hasSettings: !!backup.settings && typeof backup.settings === 'object' && !Array.isArray(backup.settings),
@@ -153,7 +156,7 @@ function renderImportDialog() {
   const rows = analysis.games.map(g => {
     if (g.status === 'ok') {
       const note = g.existing ? `ersetzt die aktuelle Karte (${g.existing.markiert} von ${g.existing.felder} Feldern erledigt)` : 'legt die Karte neu an';
-      return `<div class="imp-row imp-ok"><b>✓ ${esc(g.titel)}</b><small>${esc(note)}</small></div>`;
+      return `<div class="imp-row imp-ok"><b>✓ ${esc(g.titel)}</b><small>${esc(note)}</small>${g.notes.map(n => `<small>${esc(n)}</small>`).join('')}</div>`;
     }
     return `<div class="imp-row imp-bad"><b>✕ ${esc(g.titel)}</b>${g.problems.map(p => `<small>${esc(p)}</small>`).join('')}<small>Wird nicht importiert.</small></div>`;
   }).join('');

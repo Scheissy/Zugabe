@@ -51,6 +51,13 @@ Zu jedem Feld lässt sich ein Datum (wann geschafft) und ein Info-Text (z. B. wo
 - Entmarkieren löscht Datum und Info nicht. „Markierungen löschen“ und „Neue Karte“ setzen sie zurück (mit Rückfrage, auch wenn nur eine Info vorhanden ist).
 - Das Freifeld hat keine Details.
 
+### Felder im Spiel umbauen (Textfeld → Kombi-Feld)
+
+Ändert man im Spiel ein Textfeld in ein Kombi-Feld mit gleichem Text (Beispiel: „Gesang in 6 Sprachen“ mit `ab: 6` und eigenen Einträgen), ziehen bereits gespeicherte
+und importierte Karten automatisch mit: Die Zelle wird zum Kombi-Feld ohne Häkchen, die frühere einfache Markierung und ein Zähler dieses Felds entfallen
+(das Feld ist erst mit genug Häkchen fertig), Datum und Info bleiben, alle anderen Felder bleiben unverändert. Beim Import zeigt der Dialog dazu einen Hinweis;
+Sicherungen aus der Zeit vor dem Umbau lassen sich so weiter einlesen.
+
 ### Zähler (Felder mehrfach werten)
 
 Ein Textfeld kann mehrfach „geschafft“ werden. Das Antippen des Felds zählt als **1**; hochgezählt wird im Dialog „Datum & Info“ (Feld lang drücken oder in der Lupe)

@@ -23,7 +23,7 @@
 //                erscheint beim Antippen in der Lupe unter der Karte.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 8;
+const BINGO_DATA_VERSION = 9;
 
 // Dummydaten für die Testkarte 9×9: 9 Akteure × 9 Ereignisse = 81 verschiedene Felder mit Kurztext.
 const DUMMY_FELDER = (() => {
@@ -42,7 +42,8 @@ const BINGO_GAMES = [
     beschreibung: '7×7, feste Karte (Reihenfolge wie im Original)',
     groesse: 7, freiMitte: false, ziel: 'linie', fest: true,
     felder: [
-      'Gesang in 6 Sprachen', 'Feature vom Band', 'Überraschungsgast auf der Bühne', 'nur einer von 4 Rappern gut', '30 Minuten Verspätung', 'vor Ort erkennen, dass die Band schon kannte', 'Weniger als eine Stunde Hauptact',
+      { text: 'Gesang in 6 Sprachen', ab: 6, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Italienisch', 'Portugiesisch', 'Türkisch', 'Russisch'], eigene: true, eigeneHinweis: 'Weitere Sprache' },
+      'Feature vom Band', 'Überraschungsgast auf der Bühne', 'nur einer von 4 Rappern gut', '30 Minuten Verspätung', 'vor Ort erkennen, dass die Band schon kannte', 'Weniger als eine Stunde Hauptact',
       'Weihnachtskonzert', 'plötzlich selbst on Stage', 'alle in die Knie gehen', 'Kein Le HH B Hal HB Konzert', 'Bands zweimal im Jahr sehen', 'Flinta Moshpit zum Ausruhen', '5 Tage am Stück Konzerte',
       'Keine Zugabe spielen', 'über 2 Stunden Hauptact', 'Neue Location', 'Special Location', 'Signierte Support Vinyl', 'Künstler zu Tränen gerührt', 'Moshpit mit Band',
       'Text oder Akkorde vergessen', 'Künstler freestyled', 'Reunion Konzert', 'Beyoncé auch vom Band', 'T-Shirt kaufen', 'Tagesfestival mit 5 Bands', 'Schallplatte an der Garderobe abgeben',

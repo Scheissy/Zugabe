@@ -12,7 +12,8 @@
   "test/test_sicherung.js",
   "test/test_fest.js",
   "test/test_zaehler.js",
-  "test/test_auswahl.js"
+  "test/test_auswahl.js",
+  "test/test_umstellung.js"
  ],
  "mutations": [
   {
@@ -686,6 +687,36 @@
    "file": "js/02-storage.js",
    "old": "autoDatum: true, zaehler: true, lupe: 'auto' };",
    "new": "autoDatum: true, zaehler: false, lupe: 'auto' };"
+  },
+  {
+   "name": "X1 Gespeicherte Karte wird nicht auf das Kombi-Feld umgestellt",
+   "file": "js/02-storage.js",
+   "old": "      if (game && card) migrateCombos(game, card);\n",
+   "new": ""
+  },
+  {
+   "name": "X2 Frühere Markierung des umgestellten Felds bleibt",
+   "file": "js/02-storage.js",
+   "old": "    card.marks = card.marks.filter(x => x !== p);\n",
+   "new": ""
+  },
+  {
+   "name": "X3 Zähler des umgestellten Felds bleibt",
+   "file": "js/02-storage.js",
+   "old": "    if (card.counts) delete card.counts[p];\n    migrated.push",
+   "new": "    migrated.push"
+  },
+  {
+   "name": "X4 Import stellt Textfelder nicht auf Kombi-Felder um",
+   "file": "js/08-sicherung.js",
+   "old": "const migrated = migrateCombos(game, card);",
+   "new": "const migrated = [];"
+  },
+  {
+   "name": "X5 Umstellung ohne Hinweis im Import",
+   "file": "js/08-sicherung.js",
+   "old": "notes: r.card ? r.notes : [], card: r.card,",
+   "new": "notes: [], card: r.card,"
   }
  ]
 }

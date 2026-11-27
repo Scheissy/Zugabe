@@ -100,6 +100,25 @@ function sanitizeSettings(raw) {
   };
 }
 
+// Wurde ein Textfeld im Spiel inzwischen zum Kombi-Feld umgebaut (gleicher Text), zieht die gespeicherte oder importierte Karte mit:
+// die Zelle wird zum Kombi-Feld ohne Häkchen; die frühere einfache Markierung und ein Zähler dieses Felds entfallen
+// (das Feld ist ja erst mit genug Häkchen fertig); Datum und Info bleiben. Rückgabe: Liste { text, wasMarked } der umgestellten Felder.
+function migrateCombos(game, card) {
+  const combos = new Map();
+  game.felder.forEach(f => { if (isComboEntry(f)) combos.set(String(f.text).slice(0, MAX_FELD_LEN), f); });
+  const migrated = [];
+  if (!combos.size) return migrated;
+  card.cells.forEach((c, p) => {
+    if (typeof c !== 'string' || !combos.has(c)) return;
+    const wasMarked = card.marks.includes(p);
+    card.cells[p] = comboCell(combos.get(c));
+    card.marks = card.marks.filter(x => x !== p);
+    if (card.counts) delete card.counts[p];
+    migrated.push({ text: c, wasMarked: wasMarked });
+  });
+  return migrated;
+}
+
 function saveToStorage() {
   stateVersion++;
   try {
@@ -124,6 +143,7 @@ function loadFromStorage() {
       const game = games.find(g => g.id === id);
       // Karten zu Spielen, die es gerade nicht gibt, bleiben unangetastet erhalten (Spiel kann zurückkommen).
       const card = game ? sanitizeCard(game, data.cards[id]) : data.cards[id];
+      if (game && card) migrateCombos(game, card);
       if (card) cards[id] = card;
     });
     appState.cards = cards;
