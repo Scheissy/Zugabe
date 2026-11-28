@@ -95,7 +95,7 @@ Für Felder wie „5 Tage am Stück Konzerte“, „5 Tage ohne Konzert“ oder 
   (Stand = Schwellwert, oder die frühere Anzahl „×N“, wenn sie größer war); ein unmarkiertes Feld beginnt bei 0. Datum und Info bleiben. Beim Import steht dazu ein Hinweis im Dialog.
 - Der Zählerstand steckt in der Sicherung (Export/Import) und wird beim Import geprüft: nur an Zählfeldern, ganze Zahlen von 1 bis 999. Ein Zählfeld, dessen Schwellwert
   oder Einheit sich im Spiel geändert hat, lässt die Karte beim Import ablehnen (der Stand würde sonst etwas anderes bedeuten).
-- Mitgeliefert in „Konzerte Bingo Season 10“: „5 Tage am Stück Konzerte“ (ab 5), „5 Tage ohne Konzert“ (ab 5), „2 unterschiedliche Locations an einem Tag“ (ab 2).
+- Mitgeliefert in „Konzerte Bingo Season 10“: „5 Tage am Stück Konzerte“ (ab 5), „5 Tage ohne Konzert“ (ab 5), „2 unterschiedliche Locations an einem Tag“ (ab 2), „Band zum 5. mal sehen“ (ab 5, Einheit „mal“).
 
 ### Sicherung (Export und Import)
 

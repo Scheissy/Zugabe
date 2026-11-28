@@ -250,14 +250,14 @@ const TAGE = 6, LOC = 7, KOMBI = 8;   // Positionen auf der festen Karte
   const wr = AR.window, dr = AR.document, HR = createHelpers(wr, dr);
   const g10 = wr.eval('allGames').find(g => g.id === 'konzerte-bingo-season-10');
   const zf = g10.felder.filter(wr.isCounterEntry);
-  const spec = { '5 Tage am Stück Konzerte': [5, 'Tage'], '5 Tage ohne Konzert': [5, 'Tage'], '2 unterschiedliche Locations an einem Tag': [2, 'Locations'] };
-  t.check('„Konzerte Bingo Season 10“: genau die drei Zählfelder mit den richtigen Schwellwerten und Einheiten.',
-    zf.length === 3 && zf.every(f => spec[f.text] && f.ab === spec[f.text][0] && f.einheit === spec[f.text][1] && f.zaehlfeld === true));
+  const spec = { '5 Tage am Stück Konzerte': [5, 'Tage'], '5 Tage ohne Konzert': [5, 'Tage'], '2 unterschiedliche Locations an einem Tag': [2, 'Locations'], 'Band zum 5. mal sehen': [5, 'mal'] };
+  t.check('„Konzerte Bingo Season 10“: genau die vier Zählfelder mit den richtigen Schwellwerten und Einheiten.',
+    zf.length === 4 && zf.every(f => spec[f.text] && f.ab === spec[f.text][0] && f.einheit === spec[f.text][1] && f.zaehlfeld === true));
   t.check('Das Spiel ist fehlerfrei und hat weiter 52 Felder; kein Zählfeld steht zusätzlich als Textfeld in der Liste.',
     wr.validateGames([g10]).length === 0 && g10.felder.length === 52 && g10.felder.filter(f => typeof f === 'string' && Object.keys(spec).includes(f)).length === 0);
   wr.localStorage.clear(); wr.switchTab('spiele'); HR.openGameById('konzerte-bingo-season-10');
   const counters = HR.cells().filter(c => c.classList.contains('counter'));
-  t.check('In der App: drei Zählfelder auf der 7×7-Karte mit Fortschritt „0/5“, „0/5“ und „0/2“.', counters.length === 3 && counters.map(c => c.querySelector('.cell-progress').textContent).sort().join() === '0/2,0/5,0/5');
+  t.check('In der App: vier Zählfelder auf der 7×7-Karte mit Fortschritt „0/5“ (dreimal) und „0/2“.', counters.length === 4 && counters.map(c => c.querySelector('.cell-progress').textContent).sort().join() === '0/2,0/5,0/5,0/5');
   HR.click(counters.find(c => /Locations/.test(c.textContent)));
   const inp = dr.getElementById('zahlInput');
   inp.value = '2'; inp.dispatchEvent(new wr.Event('input', { bubbles: true }));

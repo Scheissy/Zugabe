@@ -28,7 +28,7 @@
 //                erscheint beim Antippen in der Lupe unter der Karte.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 10;
+const BINGO_DATA_VERSION = 11;
 
 // Dummydaten für die Testkarte 9×9: 9 Akteure × 9 Ereignisse = 81 verschiedene Felder mit Kurztext.
 const DUMMY_FELDER = (() => {
@@ -58,7 +58,9 @@ const BINGO_GAMES = [
       { text: '5 Tage ohne Konzert', zaehlfeld: true, ab: 5, einheit: 'Tage' },
       'Felix in Berlin besuchen', 'Hip Hop Crew aus den 90ern', 'Unsignierte Vinyl mitnehmen', 'Künstler erkennt dich',
       { text: '2 unterschiedliche Locations an einem Tag', zaehlfeld: true, ab: 2, einheit: 'Locations' },
-      'Vinyl für Discogs erstellen', '3 Monate vorher Ticket kaufen', 'Ihr Süßmäuse von der Bühne', 'keine Vinyl dabei', 'Dutch Disease Leute quatschen', 'Band zum 5. mal sehen', 'Künstler verteilen Alkohol',
+      'Vinyl für Discogs erstellen', '3 Monate vorher Ticket kaufen', 'Ihr Süßmäuse von der Bühne', 'keine Vinyl dabei', 'Dutch Disease Leute quatschen',
+      { text: 'Band zum 5. mal sehen', zaehlfeld: true, ab: 5, einheit: 'mal' },
+      'Künstler verteilen Alkohol',
       // Ab hier: Felder, die auf einer zweiten Karte desselben Spiels vorkamen (andere Anordnung). Die ersten 49 Felder bilden
       // die feste Karte; diese hier sind für den Import weiterer Spielstände da.
       'Amerikanische Künstler', 'RBF Location', '4 Rapper auf der Bühne höchstens einer kann rappen'
