@@ -29,8 +29,62 @@ function openDetails(p) {
   document.getElementById('detailInfo').value = det.i || '';
   renderLupe();
   renderCountRow();
+  renderDetailSpecial(false);
   clearSelectionSoon();
   openModal('detailModal');
+}
+// Kombi- und Zählfelder: Überblick im Dialog. Kombi-Feld: Stand und alle Punkte (abgehakt oder offen, auch eigene Einträge), bearbeitet wird
+// in der Checkliste („Checkliste bearbeiten“). Zählfeld: Stand mit − / ＋ und Zahleneingabe, direkt hier änderbar. Bei Textfeldern bleibt der Bereich weg.
+function renderDetailSpecial(keepInput) {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[detailPos];
+  const counter = isCounterCell(c), combo = isComboEntry(c);
+  const $ = id => document.getElementById(id);
+  $('detailSpecial').style.display = counter || combo ? '' : 'none';
+  if (!counter && !combo) return;
+  $('detailSpecialLabel').textContent = counter ? 'Zählerstand' : 'Checkliste';
+  $('detailSpecialProgress').textContent = counter ? zahlStatusText(c, zahlOf(card, detailPos)) : comboStatusText(card, detailPos);
+  $('detailSpecialProgress').classList.toggle('done', isMarked(card, detailPos));
+  $('detailZahlRow').style.display = counter ? '' : 'none';
+  $('detailPoints').style.display = combo ? '' : 'none';
+  $('detailSpecialEdit').style.display = combo ? '' : 'none';
+  if (counter) {
+    const k = zahlOf(card, detailPos);
+    if (!keepInput) $('detailZahlInput').value = String(k);
+    $('detailZahlUnit').textContent = c.u || '';
+    $('detailZahlMinus').disabled = k <= 0;
+    $('detailZahlPlus').disabled = k >= MAX_ZAHL;
+    return;
+  }
+  const checked = card.checks[detailPos] || [];
+  const row = (on, text, own) => `<li class="${on ? 'on' : 'off'}${own ? ' own' : ''}"><span class="pt-mark" role="img" aria-label="${on ? 'abgehakt' : 'offen'}">${on ? '☑' : '☐'}</span><span>${esc(text)}</span></li>`;
+  $('detailPoints').innerHTML = c.p.map((name, i) => row(checked.includes(i), name, false)).join('')
+    + (c.e ? eigeneZaehlende(card, detailPos).map(x => row(true, x, true)).join('') : '');
+}
+function applyDetailZahl(n, keepInput) {
+  const r = setZahl(appState.activeGame, detailPos, n);
+  if (r.changed) {
+    const card = appState.cards[appState.activeGame];
+    document.getElementById('detailDate').value = (detailsOf(card, detailPos) || {}).d || '';   // Datum kann beim Erreichen des Schwellwerts automatisch gesetzt worden sein
+    renderBoard();
+    if (r.justWon) showToast('Bingo!');
+  }
+  renderDetailSpecial(keepInput);
+}
+function detailZahlStep(dir) {
+  const card = appState.cards[appState.activeGame];
+  if (card && isCounterCell(card.cells[detailPos])) applyDetailZahl(zahlOf(card, detailPos) + dir, false);
+}
+function onDetailZahlInput(v) {
+  const z = parseZahlEingabe(v);
+  const card = appState.cards[appState.activeGame];
+  if (z && card && isCounterCell(card.cells[detailPos])) applyDetailZahl(z.n, z.keep);
+}
+// Vom Überblick zur Checkliste des Kombi-Felds wechseln.
+function detailEditSpecial() {
+  const p = detailPos;
+  closeModal('detailModal');
+  openCombo(p);
 }
 // Zähler (nur Textfelder): zeigt, wie oft das Feld geschafft wurde; + auf einem unmarkierten Feld markiert es (= 1).
 function renderCountRow() {

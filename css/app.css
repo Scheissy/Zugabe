@@ -108,6 +108,17 @@ textarea.detail-input { resize: vertical; min-height: 76px; }
 .prog-quick-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; cursor: pointer; }
 .prog-quick-btn:active { background: var(--border); }
 
+/* DATUM & INFO: Überblick über Kombi- und Zählfelder */
+.detail-special { display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.detail-special .zahl-row { margin: 2px 0; }
+.detail-special .prog-quick-btn { align-self: flex-start; }
+.detail-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; font-size: 14px; }
+.detail-points li { display: flex; align-items: baseline; gap: 10px; padding: 6px 2px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.detail-points li:last-child { border-bottom: none; }
+.detail-points li.off { color: var(--text3); }
+.detail-points li.own { font-style: italic; }
+.detail-points .pt-mark { flex-shrink: 0; }
+
 /* ZÄHLFELD (Zählerstand im Dialog) */
 .zahl-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px 0 12px; }
 .zahl-input { width: 96px; text-align: center; font-size: 22px; font-weight: 700; padding: 8px 6px; }

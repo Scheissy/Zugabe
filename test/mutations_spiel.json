@@ -15,7 +15,8 @@
   "test/test_auswahl.js",
   "test/test_umstellung.js",
   "test/test_eigene_zeilen.js",
-  "test/test_zaehlfeld.js"
+  "test/test_zaehlfeld.js",
+  "test/test_details_spezial.js"
  ],
  "mutations": [
   {
@@ -879,8 +880,8 @@
   {
    "name": "ZF17 Eingetippte Zahl wird nicht begrenzt",
    "file": "js/04-ansicht.js",
-   "old": "applyZahl(Math.min(n, MAX_ZAHL), n <= MAX_ZAHL);",
-   "new": "applyZahl(n, true);"
+   "old": "return { n: Math.min(n, MAX_ZAHL), keep: n <= MAX_ZAHL };",
+   "new": "return { n: n, keep: true };"
   },
   {
    "name": "ZF18 Plus bleibt bei 999 aktiv",
@@ -893,6 +894,72 @@
    "file": "js/04-ansicht.js",
    "old": "function zahlReset() { applyZahl(0, false); }",
    "new": "function zahlReset() { applyZahl(1, false); }"
+  },
+  {
+   "name": "ZS1 Überblick zeigt Zählfeld-Stand nicht als geschafft",
+   "file": "js/07-details.js",
+   "old": "$('detailSpecialProgress').classList.toggle('done', isMarked(card, detailPos));",
+   "new": "$('detailSpecialProgress').classList.toggle('done', false);"
+  },
+  {
+   "name": "ZS2 Überblick zeigt abgehakte Punkte als offen",
+   "file": "js/07-details.js",
+   "old": "row(checked.includes(i), name, false)",
+   "new": "row(false, name, false)"
+  },
+  {
+   "name": "ZS3 Eigene Einträge fehlen im Überblick",
+   "file": "js/07-details.js",
+   "old": "(c.e ? eigeneZaehlende(card, detailPos).map(x => row(true, x, true)).join('') : '')",
+   "new": "''"
+  },
+  {
+   "name": "ZS4 Punkttext im Überblick nicht maskiert",
+   "file": "js/07-details.js",
+   "old": "<span>${esc(text)}</span></li>",
+   "new": "<span>${text}</span></li>"
+  },
+  {
+   "name": "ZS5 Überblick erscheint auch bei Textfeldern",
+   "file": "js/07-details.js",
+   "old": "$('detailSpecial').style.display = counter || combo ? '' : 'none';",
+   "new": "$('detailSpecial').style.display = '';"
+  },
+  {
+   "name": "ZS6 Zählerstand im Dialog ändert die Karte nicht",
+   "file": "js/07-details.js",
+   "old": "    renderBoard();\n    if (r.justWon) showToast('Bingo!');\n  }\n  renderDetailSpecial(keepInput);",
+   "new": "    if (r.justWon) showToast('Bingo!');\n  }\n  renderDetailSpecial(keepInput);"
+  },
+  {
+   "name": "ZS7 Datum nach Erreichen des Schwellwerts erscheint nicht im Dialog",
+   "file": "js/07-details.js",
+   "old": "document.getElementById('detailDate').value = (detailsOf(card, detailPos) || {}).d || '';   // Datum kann beim Erreichen",
+   "new": "void 0;   // Datum kann beim Erreichen"
+  },
+  {
+   "name": "ZS8 Bearbeiten-Knopf lässt den Dialog offen",
+   "file": "js/07-details.js",
+   "old": "  const p = detailPos;\n  closeModal('detailModal');\n  openCombo(p);",
+   "new": "  const p = detailPos;\n  openCombo(p);"
+  },
+  {
+   "name": "ZS9 Plus im Dialog bleibt bei 999 aktiv",
+   "file": "js/07-details.js",
+   "old": "$('detailZahlPlus').disabled = k >= MAX_ZAHL;",
+   "new": "$('detailZahlPlus').disabled = false;"
+  },
+  {
+   "name": "ZS10 Eingetippte Zahl wird im Dialog nicht ausgewertet",
+   "file": "js/07-details.js",
+   "old": "if (z && card && isCounterCell(card.cells[detailPos])) applyDetailZahl(z.n, z.keep);",
+   "new": "if (false) applyDetailZahl(z.n, z.keep);"
+  },
+  {
+   "name": "ZS11 Duplikate eigener Einträge werden im Überblick gezeigt",
+   "file": "js/03-spiel.js",
+   "old": "if (k && !seen.has(k)) { seen.add(k); out.push(x); }",
+   "new": "if (k) { seen.add(k); out.push(x); }"
   }
  ]
 }

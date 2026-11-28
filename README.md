@@ -45,6 +45,8 @@ Zu jedem Feld lässt sich ein Datum (wann geschafft) und ein Info-Text (z. B. wo
 - **Datum automatisch:** Beim Markieren eines Felds (bei Kombi-Feldern: beim Erreichen der Schwelle) trägt die App das heutige Datum ein, wenn noch keins gesetzt ist.
   Settings → „Datum automatisch eintragen“ schaltet das ab. Ein eigenes Datum wird nie überschrieben.
 - **Bearbeiten:** Feld lang drücken oder in der Lupe „Datum & Info ergänzen/bearbeiten“. Im Dialog: Datumsfeld, „Heute“, „Entfernen“ und ein Info-Text (bis 200 Zeichen). Alles wird sofort gespeichert.
+  Bei **Kombi-Feldern** zeigt der Dialog oben außerdem den Stand und alle Punkte (☑ abgehakt, ☐ offen, eigene Einträge kursiv); „Checkliste bearbeiten“ wechselt zur Checkliste.
+  Bei **Zählfeldern** steht dort der Zählerstand mit − / ＋ und Zahleneingabe, direkt änderbar (das Datum erscheint sofort, sobald der Schwellwert erreicht ist).
 - **Anzeige:** Die Lupe zeigt Datum und Info zum angetippten Feld; ein kleiner goldener Punkt auf dem Feld zeigt, dass eine Info vorhanden ist.
 - Beim langen Drücken startet Android zusätzlich seine eigene Textauswahl. Dagegen ist im Dialog die Textauswahl abgeschaltet (Eingabefelder ausgenommen),
   und eine angefangene Auswahl wird beim Öffnen und Loslassen weggeräumt.
@@ -87,7 +89,7 @@ Für Felder wie „5 Tage am Stück Konzerte“, „5 Tage ohne Konzert“ oder 
 - **Antippen** öffnet einen Dialog: − und ＋ zählen um 1, im Zahlenfeld lässt sich direkt eine Zahl eintippen (z. B. 15), „Auf 0 zurücksetzen“ setzt zurück.
   Alles wird sofort gespeichert. Nimmt man den Stand wieder unter den Schwellwert, fällt das Feld zurück.
 - **Datum und Info:** Beim ersten Erreichen des Schwellwerts trägt die App das Datum ein (Einstellung „Datum automatisch eintragen“). Feld lang drücken öffnet wie bei
-  allen Feldern „Datum & Info“; die Zeile „Anzahl“ gibt es bei Zählfeldern nicht (der Zählerstand ist hier das Zählen).
+  allen Feldern „Datum & Info“ und zeigt dort den Zählerstand (änderbar); die Zeile „Anzahl“ gibt es bei Zählfeldern nicht (der Zählerstand ist hier das Zählen).
 - Ein Zählfeld zählt für Linie, Vollbild und „x von y Feldern“ einfach als markiert, sobald der Schwellwert erreicht ist.
 - Die Einstellung „Zähler (Felder mehrfach zählen)“ betrifft Textfelder und lässt Zählfelder unberührt.
 - „Markierungen löschen“ und „Neue Karte“ setzen die Zählerstände zurück (mit Rückfrage, auch wenn ein Stand noch unter dem Schwellwert liegt).

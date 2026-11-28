@@ -51,6 +51,13 @@ function eigeneCount(card, p) {
   eigeneList(card, p).forEach(x => { const k = normEintrag(x); if (k && !seen.has(k)) { seen.add(k); n++; } });
   return n;
 }
+// Die eigenen Einträge, die zählen (in der Reihenfolge der Eingabe), als Texte - für die Anzeige im Dialog „Datum & Info“.
+function eigeneZaehlende(card, p) {
+  const seen = new Set(card.cells[p].p.map(normEintrag));
+  const out = [];
+  eigeneList(card, p).forEach(x => { const k = normEintrag(x); if (k && !seen.has(k)) { seen.add(k); out.push(x); } });
+  return out;
+}
 // Anzahl gezählter Punkte eines Kombi-Feldes: abgehakte feste Punkte plus eigene Einträge.
 function comboCount(card, p) {
   const fixed = ((card.checks && card.checks[p]) || []).length;

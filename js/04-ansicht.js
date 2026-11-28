@@ -242,6 +242,12 @@ function fillTrailingInput() {
   }
   if (!inputs.length || (inputs[inputs.length - 1].value.trim() && inputs.length < MAX_EIGENE)) addOwnInput('');
 }
+// Statustext eines Kombi-Felds (Checklisten-Dialog und Dialog „Datum & Info“).
+function comboStatusText(card, p) {
+  const c = card.cells[p], k = comboCount(card, p), done = k >= c.ab;
+  if (c.e) return done ? `Geschafft: ${k} gezählt (nötig: ${c.ab}).` : `${k} gezählt – ab ${c.ab} zählt das Feld.`;
+  return done ? `Geschafft: ${k} von ${c.p.length} abgehakt (nötig: ${c.ab}).` : `${k} von ${c.p.length} abgehakt – ab ${c.ab} zählt das Feld.`;
+}
 // Nur den Fortschrittstext aktualisieren, damit Checkboxen und Eingabefelder (und ihr Fokus) stehen bleiben.
 function updateComboProgress() {
   const cur = currentCombo();
@@ -250,8 +256,7 @@ function updateComboProgress() {
   const k = comboCount(card, comboPos);
   const done = k >= c.ab;
   const el = document.getElementById('comboProgress');
-  if (c.e) el.textContent = done ? `Geschafft: ${k} gezählt (nötig: ${c.ab}).` : `${k} gezählt – ab ${c.ab} zählt das Feld.`;
-  else el.textContent = done ? `Geschafft: ${k} von ${c.p.length} abgehakt (nötig: ${c.ab}).` : `${k} von ${c.p.length} abgehakt – ab ${c.ab} zählt das Feld.`;
+  el.textContent = comboStatusText(card, comboPos);
   el.classList.toggle('done', done);
   if (c.e) { // doppelte Einträge zählen nicht - sichtbar machen
     const seen = new Set(c.p.map(normEintrag));
@@ -308,6 +313,17 @@ function openZahl(p) {
   renderZahlDialog(false);
   openModal('zahlModal');
 }
+// Statustext eines Zählfelds (Zähl-Dialog und Dialog „Datum & Info“).
+function zahlStatusText(c, k) {
+  return k >= c.ab ? `Geschafft: ${zahlText(c, k)} (nötig: ${c.ab}).` : `${zahlText(c, k)} – ab ${c.ab} zählt das Feld.`;
+}
+// Eingetippte Zahl auswerten: { n, keep } mit n auf MAX_ZAHL begrenzt (keep = false, wenn begrenzt werden musste), oder null bei Leerem/Ungültigem.
+function parseZahlEingabe(v) {
+  const s = String(v).trim();
+  if (!/^\d{1,6}$/.test(s)) return null;
+  const n = parseInt(s, 10);
+  return { n: Math.min(n, MAX_ZAHL), keep: n <= MAX_ZAHL };
+}
 // keepInput = true: das Eingabefeld nicht neu schreiben (sonst springt der Cursor beim Tippen).
 function renderZahlDialog(keepInput) {
   const cur = currentZahl();
@@ -317,7 +333,7 @@ function renderZahlDialog(keepInput) {
   if (!keepInput) document.getElementById('zahlInput').value = String(k);
   document.getElementById('zahlUnit').textContent = c.u || '';
   const el = document.getElementById('zahlProgress');
-  el.textContent = done ? `Geschafft: ${zahlText(c, k)} (nötig: ${c.ab}).` : `${zahlText(c, k)} – ab ${c.ab} zählt das Feld.`;
+  el.textContent = zahlStatusText(c, k);
   el.classList.toggle('done', done);
   document.getElementById('zahlMinus').disabled = k <= 0;
   document.getElementById('zahlPlus').disabled = k >= MAX_ZAHL;
@@ -337,10 +353,8 @@ function zahlStep(dir) {
 }
 // Zahl direkt eintippen (z. B. 15): sofort speichern; Leeres oder Ungültiges ändert nichts, beim Verlassen des Felds zeigt es wieder den gespeicherten Stand.
 function onZahlInput(v) {
-  const s = String(v).trim();
-  if (!/^\d{1,6}$/.test(s)) return;
-  const n = parseInt(s, 10);
-  applyZahl(Math.min(n, MAX_ZAHL), n <= MAX_ZAHL);
+  const z = parseZahlEingabe(v);
+  if (z) applyZahl(z.n, z.keep);
 }
 function zahlReset() { applyZahl(0, false); }
 

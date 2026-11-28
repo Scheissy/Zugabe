@@ -61,6 +61,18 @@
 <button class="modal-close" onclick="closeModal('detailModal')" aria-label="Schließen">✕</button>
 </div>
 <div class="modal-body">
+<div class="detail-special" id="detailSpecial" style="display:none">
+<div class="detail-label" id="detailSpecialLabel"></div>
+<div class="combo-progress" id="detailSpecialProgress" role="status"></div>
+<ul class="detail-points" id="detailPoints"></ul>
+<div class="zahl-row" id="detailZahlRow">
+<button type="button" class="zoom-btn" id="detailZahlMinus" onclick="detailZahlStep(-1)" aria-label="Eins weniger">−</button>
+<input type="number" id="detailZahlInput" class="detail-input zahl-input" inputmode="numeric" min="0" max="999" step="1" aria-label="Zählerstand" oninput="onDetailZahlInput(this.value)" onchange="renderDetailSpecial(false)">
+<span class="zahl-unit" id="detailZahlUnit"></span>
+<button type="button" class="zoom-btn" id="detailZahlPlus" onclick="detailZahlStep(1)" aria-label="Eins mehr">＋</button>
+</div>
+<button type="button" class="prog-quick-btn" id="detailSpecialEdit" onclick="detailEditSpecial()">Checkliste bearbeiten</button>
+</div>
 <div class="detail-count" id="detailCountRow">
 <span class="detail-label">Anzahl</span>
 <div class="count-stepper">
