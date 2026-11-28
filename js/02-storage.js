@@ -9,7 +9,8 @@ const DEFAULT_SETTINGS = { confirmNewCard: true, showCounter: true, useKurz: tru
 //                    checks: { Position: [Nummern der abgehakten Punkte] },
 //                    eigene: { Position: [selbst eingetragene Texte] } (nur Kombi-Felder mit e: true),
 //                    details: { Position: { d: 'JJJJ-MM-TT', i: 'Info' } } (beides optional),
-//                    counts: { Position: Anzahl 2..99 } (nur markierte Textfelder; 1 = Normalfall, nicht gespeichert) }
+//                    counts: { Position: Anzahl 2..99 } (nur markierte Textfelder; 1 = Normalfall, nicht gespeichert),
+//                    stand: { Position: Zählerstand 1..MAX_ZAHL } (nur Zählfelder { t, ab, z: true, u }; 0 = nicht gespeichert) }
 // Die Feldtexte werden mitgespeichert: eine laufende Karte bleibt auch dann gleich, wenn bingo-data.js geändert wird.
 let appState = { cards: {}, settings: { ...DEFAULT_SETTINGS }, activeGame: '' };
 let stateVersion = 0;
@@ -19,6 +20,12 @@ let stateVersion = 0;
 function sanitizeCell(c) {
   if (c === null) return null;
   if (typeof c === 'string') return c ? c.slice(0, MAX_FELD_LEN) : undefined;
+  if (isCounterCell(c)) {   // Zählfeld { t, ab, z: true, u }
+    if (typeof c.t !== 'string' || !c.t || !Number.isInteger(c.ab) || c.ab < 1 || c.ab > MAX_ZAHL) return undefined;
+    const z = { t: c.t.slice(0, MAX_FELD_LEN), ab: c.ab, z: true };
+    if (typeof c.u === 'string' && c.u.trim()) z.u = c.u.trim().slice(0, MAX_EINHEIT);
+    return z;
+  }
   if (!isComboEntry(c) || typeof c.t !== 'string' || !c.t || !Array.isArray(c.p)) return undefined;
   const eig = c.e === true;
   if (c.p.length < (eig ? 0 : 2) || c.p.length > MAX_PUNKTE || c.p.some(x => typeof x !== 'string' || !x)
@@ -86,7 +93,15 @@ function sanitizeCard(game, raw) {
     if (!Number.isInteger(p) || String(p) !== k || p < 0 || p >= total || typeof cells[p] !== 'string' || !marks.includes(p) || !Number.isInteger(n) || n < 2 || n > MAX_COUNT) return;
     counts[p] = n;
   });
-  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene, details: details, counts: counts };
+  // Zählerstand der Zählfelder: nur dort, Werte 1 bis MAX_ZAHL.
+  const stand = {};
+  const rst = raw.stand && typeof raw.stand === 'object' && !Array.isArray(raw.stand) ? raw.stand : {};
+  Object.keys(rst).forEach(k => {
+    const p = Number(k), n = rst[k];
+    if (!Number.isInteger(p) || String(p) !== k || p < 0 || p >= total || !isCounterCell(cells[p]) || !Number.isInteger(n) || n < 1 || n > MAX_ZAHL) return;
+    stand[p] = n;
+  });
+  return { seed: Number.isInteger(raw.seed) ? raw.seed : 0, cells: cells, marks: marks, checks: checks, eigene: eigene, details: details, counts: counts, stand: stand };
 }
 
 // Macht aus gespeicherten oder importierten Einstellungen gültige: falsche Typen und unbekannte Werte fallen auf den Standard.
@@ -119,6 +134,30 @@ function migrateCombos(game, card) {
   return migrated;
 }
 
+// Wurde ein Textfeld im Spiel inzwischen zum Zählfeld umgebaut (gleicher Text), zieht die gespeicherte oder importierte Karte mit:
+// die Zelle wird zum Zählfeld; war das Textfeld markiert, steht der Zähler auf dem Schwellwert (oder auf der früheren Anzahl, wenn die
+// größer war), damit das Feld geschafft bleibt. Datum und Info bleiben. Rückgabe: Liste { text, wasMarked, wert } der umgestellten Felder.
+function migrateCounters(game, card) {
+  const counters = new Map();
+  game.felder.forEach(f => { if (isCounterEntry(f)) counters.set(String(f.text).slice(0, MAX_FELD_LEN), f); });
+  const migrated = [];
+  if (!counters.size) return migrated;
+  card.stand = card.stand || {};
+  card.cells.forEach((c, p) => {
+    if (typeof c !== 'string' || !counters.has(c)) return;
+    const f = counters.get(c);
+    const wasMarked = card.marks.includes(p);
+    const old = (card.counts && card.counts[p]) || 1;
+    card.cells[p] = counterCell(f);
+    card.marks = card.marks.filter(x => x !== p);
+    if (card.counts) delete card.counts[p];
+    let wert = 0;
+    if (wasMarked) { wert = Math.min(MAX_ZAHL, Math.max(f.ab, old)); card.stand[p] = wert; }
+    migrated.push({ text: c, wasMarked: wasMarked, wert: wert });
+  });
+  return migrated;
+}
+
 function saveToStorage() {
   stateVersion++;
   try {
@@ -143,7 +182,7 @@ function loadFromStorage() {
       const game = games.find(g => g.id === id);
       // Karten zu Spielen, die es gerade nicht gibt, bleiben unangetastet erhalten (Spiel kann zurückkommen).
       const card = game ? sanitizeCard(game, data.cards[id]) : data.cards[id];
-      if (game && card) migrateCombos(game, card);
+      if (game && card) { migrateCombos(game, card); migrateCounters(game, card); }
       if (card) cards[id] = card;
     });
     appState.cards = cards;

@@ -17,10 +17,21 @@ function createCard(game, seed) {
   for (let p = 0; p < total; p++) {
     if (free.includes(p)) { cells.push(null); continue; }
     const f = game.felder[pool[k++]];
-    cells.push(isComboEntry(f) ? comboCell(f) : f);
+    cells.push(isCounterEntry(f) ? counterCell(f) : isComboEntry(f) ? comboCell(f) : f);
   }
-  return { seed: seed, cells: cells, marks: [], checks: {}, eigene: {}, details: {}, counts: {} };
+  return { seed: seed, cells: cells, marks: [], checks: {}, eigene: {}, details: {}, counts: {}, stand: {} };
 }
+
+// Zelle aus einem Zählfeld der Daten: ab = Schwellwert, u = Einheit (optional, z. B. "Tage"). Der Zählerstand steht in card.stand[Position].
+function counterCell(f) {
+  const cell = { t: f.text, ab: f.ab, z: true };
+  if (typeof f.einheit === 'string' && f.einheit.trim()) cell.u = f.einheit.trim().slice(0, MAX_EINHEIT);
+  return cell;
+}
+// Aktueller Zählerstand eines Zählfelds (0 = noch nicht gezählt).
+function zahlOf(card, p) { return (card.stand && card.stand[p]) || 0; }
+// Zählerstand mit Einheit als Text: "7 Tage" (ohne Einheit nur "7").
+function zahlText(c, k) { return k + (c && c.u ? ' ' + c.u : ''); }
 
 // Zelle aus einem Kombi-Feld der Daten: e = eigene Einträge erlaubt, h = Platzhalter für das Eingabefeld.
 function comboCell(f) {
@@ -46,10 +57,12 @@ function comboCount(card, p) {
   const c = card.cells[p];
   return fixed + (isComboEntry(c) && c.e ? eigeneCount(card, p) : 0);
 }
-// Ein Feld zählt als markiert: Freifeld immer, Textfeld nach Tipp, Kombi-Feld ab der geforderten Zahl Häkchen.
+// Ein Feld zählt als markiert: Freifeld immer, Textfeld nach Tipp, Kombi-Feld ab der geforderten Zahl Häkchen,
+// Zählfeld ab dem Schwellwert.
 function isMarked(card, p) {
   const c = card.cells[p];
   if (c === null) return true;
+  if (isCounterCell(c)) return zahlOf(card, p) >= c.ab;
   if (isComboEntry(c)) return comboCount(card, p) >= c.ab;
   return card.marks.includes(p);
 }
@@ -70,7 +83,7 @@ function isWon(game, card) {
 }
 // Erledigte Felder (ohne Freifeld; ein Kombi-Feld zählt, wenn es seine Häkchen hat) und alle echten Felder der Karte.
 function markedCount(card) {
-  return card.marks.length + card.cells.filter((c, p) => isComboEntry(c) && isMarked(card, p)).length;
+  return card.marks.length + card.cells.filter((c, p) => isSpecialEntry(c) && isMarked(card, p)).length;
 }
 function fieldCount(card) { return card.cells.filter(c => c !== null).length; }
 
@@ -122,7 +135,7 @@ function applyChange(game, card, mutate, p) {
 function toggleMark(id, p) {
   const game = gameById(id);
   const card = appState.cards[id];
-  if (!game || !card || !Number.isInteger(p) || p < 0 || p >= card.cells.length || card.cells[p] === null || isComboEntry(card.cells[p])) {
+  if (!game || !card || !Number.isInteger(p) || p < 0 || p >= card.cells.length || card.cells[p] === null || isSpecialEntry(card.cells[p])) {
     return { changed: false, won: false, justWon: false };
   }
   return applyChange(game, card, () => {
@@ -196,6 +209,20 @@ function setCount(id, p, n) {
   }, p);
 }
 
+// Zählerstand eines Zählfelds setzen (0 bis MAX_ZAHL; 0 = zurück auf nicht gezählt). Das Feld gilt ab dem Schwellwert des Felds als geschafft;
+// beim ersten Erreichen trägt die App das Datum ein (siehe applyChange), nimmt man den Stand wieder unter den Schwellwert, fällt das Feld zurück.
+function setZahl(id, p, n) {
+  const none = { changed: false, won: false, justWon: false };
+  const game = gameById(id);
+  const card = appState.cards[id];
+  if (!game || !card || !Number.isInteger(p) || p < 0 || p >= card.cells.length || !isCounterCell(card.cells[p]) || !Number.isInteger(n) || n < 0 || n > MAX_ZAHL) return none;
+  if (zahlOf(card, p) === n) return none;
+  return applyChange(game, card, () => {
+    card.stand = card.stand || {};
+    if (n > 0) card.stand[p] = n; else delete card.stand[p];
+  }, p);
+}
+
 function newCardFor(id) {
   const game = gameById(id);
   if (!game) return null;
@@ -214,6 +241,7 @@ function resetMarks(id) {
   card.eigene = {};
   card.details = {};
   card.counts = {};
+  card.stand = {};
   saveToStorage();
 }
 function resetAllCards() {

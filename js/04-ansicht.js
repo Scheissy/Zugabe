@@ -114,6 +114,11 @@ function renderBoard() {
   board.innerHTML = card.cells.map((c, p) => {
     const w = win.has(p) ? ' win' : '';
     if (c === null) return `<div class="cell n${n} free marked${w}" data-p="${p}">Frei</div>`;
+    if (isCounterCell(c)) {
+      const k = zahlOf(card, p), m = isMarked(card, p);
+      const lab = displayText(appState.settings.useKurz && kurzOf(game, c.t) || c.t);
+      return `<button type="button" class="cell n${n} counter${lab !== displayText(c.t) ? ' kurz' : ''}${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}" data-p="${p}" aria-haspopup="dialog" aria-label="${esc(c.t)}, ${esc(zahlText(c, k))} von ${c.ab}" title="${esc(c.t)}" onclick="openZahl(${p})"><span class="cell-text">${esc(lab)}</span><span class="cell-progress">${m ? '✓ ' + k : k + '/' + c.ab}</span></button>`;
+    }
     if (isComboEntry(c)) {
       const k = comboCount(card, p);
       const lab = displayText(appState.settings.useKurz && kurzOf(game, c.t) || c.t);
@@ -165,8 +170,9 @@ function renderLupe() {
   if (!on) return;
   const c = lupePos >= 0 ? card.cells[lupePos] : null;
   if (c === null || c === undefined) { el.innerHTML = '<small>Tippe ein Feld an, um den ganzen Text hier zu lesen. Lang drücken: Datum &amp; Info.</small>'; return; }
-  const full = isComboEntry(c) ? c.t : c;
-  const meta = isComboEntry(c) ? `☑ ${comboCount(card, lupePos)}/${c.ab}` : (card.marks.includes(lupePos) ? 'markiert' + (zaehlerAn() && countOf(card, lupePos) > 1 ? ' · ' + countOf(card, lupePos) + '×' : '') : 'nicht markiert');
+  const full = isSpecialEntry(c) ? c.t : c;
+  const meta = isCounterCell(c) ? (isMarked(card, lupePos) ? `geschafft · ${zahlText(c, zahlOf(card, lupePos))}` : `${zahlOf(card, lupePos)}/${c.ab}${c.u ? ' ' + c.u : ''}`)
+    : isComboEntry(c) ? `☑ ${comboCount(card, lupePos)}/${c.ab}` : (card.marks.includes(lupePos) ? 'markiert' + (zaehlerAn() && countOf(card, lupePos) > 1 ? ' · ' + countOf(card, lupePos) + '×' : '') : 'nicht markiert');
   const det = detailsOf(card, lupePos);
   el.innerHTML = `<span class="lupe-text">${esc(full)}</span><small>${esc(meta)}</small>`
     + (det && det.d ? `<span class="lupe-detail">Datum: ${esc(formatDate(det.d))}</span>` : '')
@@ -284,9 +290,63 @@ function onOwnChange() {
   updateComboProgress();
 }
 
+// ── ZÄHLFELDER: Zählerstand im Dialog ────────────────────────────────────────
+let zahlPos = -1;
+function currentZahl() {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[zahlPos];
+  return isCounterCell(c) ? { card: card, c: c } : null;
+}
+function openZahl(p) {
+  const card = appState.cards[appState.activeGame];
+  const c = card && card.cells[p];
+  if (!isCounterCell(c)) return;
+  zahlPos = p;
+  lupePos = p;
+  renderLupe();
+  document.getElementById('zahlTitle').textContent = c.t;
+  renderZahlDialog(false);
+  openModal('zahlModal');
+}
+// keepInput = true: das Eingabefeld nicht neu schreiben (sonst springt der Cursor beim Tippen).
+function renderZahlDialog(keepInput) {
+  const cur = currentZahl();
+  if (!cur) return;
+  const { card, c } = cur;
+  const k = zahlOf(card, zahlPos), done = k >= c.ab;
+  if (!keepInput) document.getElementById('zahlInput').value = String(k);
+  document.getElementById('zahlUnit').textContent = c.u || '';
+  const el = document.getElementById('zahlProgress');
+  el.textContent = done ? `Geschafft: ${zahlText(c, k)} (nötig: ${c.ab}).` : `${zahlText(c, k)} – ab ${c.ab} zählt das Feld.`;
+  el.classList.toggle('done', done);
+  document.getElementById('zahlMinus').disabled = k <= 0;
+  document.getElementById('zahlPlus').disabled = k >= MAX_ZAHL;
+  document.getElementById('zahlReset').disabled = k === 0;
+}
+function applyZahl(n, keepInput) {
+  const r = setZahl(appState.activeGame, zahlPos, n);
+  if (r.changed) {
+    renderBoard();
+    if (r.justWon) showToast('Bingo!');
+  }
+  renderZahlDialog(keepInput);
+}
+function zahlStep(dir) {
+  const cur = currentZahl();
+  if (cur) applyZahl(zahlOf(cur.card, zahlPos) + dir, false);
+}
+// Zahl direkt eintippen (z. B. 15): sofort speichern; Leeres oder Ungültiges ändert nichts, beim Verlassen des Felds zeigt es wieder den gespeicherten Stand.
+function onZahlInput(v) {
+  const s = String(v).trim();
+  if (!/^\d{1,6}$/.test(s)) return;
+  const n = parseInt(s, 10);
+  applyZahl(Math.min(n, MAX_ZAHL), n <= MAX_ZAHL);
+}
+function zahlReset() { applyZahl(0, false); }
+
 function hasMarks() {
   const card = appState.cards[appState.activeGame];
-  return !!card && markedCount(card) + Object.keys(card.checks || {}).length + Object.keys(card.eigene || {}).length + Object.keys(card.details || {}).length > 0;
+  return !!card && markedCount(card) + Object.keys(card.checks || {}).length + Object.keys(card.eigene || {}).length + Object.keys(card.details || {}).length + Object.keys(card.stand || {}).length > 0;
 }
 function askNewCard() {
   const id = appState.activeGame;

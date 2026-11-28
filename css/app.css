@@ -101,12 +101,18 @@ textarea.detail-input { resize: vertical; min-height: 76px; }
 .cell.free { cursor: default; font-style: italic; }
 .cell.win { box-shadow: 0 0 0 2px var(--gold) inset; }
 .cell:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.cell.combo { flex-direction: column; gap: 3px; }
+.cell.combo, .cell.counter { flex-direction: column; gap: 3px; }
 .cell-progress { font-size: 0.85em; font-weight: 700; opacity: 0.85; white-space: nowrap; }
 .board-actions { display: flex; gap: 8px; margin-top: 14px; }
 .board-actions .prog-quick-btn { flex: 1; }
 .prog-quick-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; cursor: pointer; }
 .prog-quick-btn:active { background: var(--border); }
+
+/* ZÄHLFELD (Zählerstand im Dialog) */
+.zahl-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px 0 12px; }
+.zahl-input { width: 96px; text-align: center; font-size: 22px; font-weight: 700; padding: 8px 6px; }
+.zahl-unit { color: var(--text2); font-size: 15px; }
+.zahl-unit:empty { display: none; }
 
 /* KOMBI-FELD (Checkliste) */
 .combo-progress { font-size: 13px; color: var(--text2); padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); }

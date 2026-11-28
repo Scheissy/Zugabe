@@ -111,7 +111,7 @@ function fitBoard() {
   board.querySelectorAll('.cell').forEach(el => {
     const c = card.cells[+el.dataset.p];
     if (c === null || c === undefined) return;
-    const combo = isComboEntry(c), full = combo ? c.t : c;
+    const combo = isSpecialEntry(c), full = combo ? c.t : c;
     const kurz = appState.settings.useKurz ? kurzOf(game, full) : '';
     const variants = [displayText(full)];
     if (kurz && kurz !== full) variants.push(displayText(kurz));

@@ -66,8 +66,33 @@ const MAX_EIGENE = 10;        // so viele eigene Einträge sind in einem Kombi-F
 const MAX_EIGENE_LEN = 40;    // Länge eines eigenen Eintrags
 // Ein Eintrag in "felder" ist entweder ein Text oder ein Kombi-Feld { text, punkte: [...], ab: Zahl }.
 // Auf der Karte wird daraus eine Zelle { t, p, ab } (gleiche Form für gespeicherte Karten).
-function isComboEntry(f) { return !!f && typeof f === 'object' && !Array.isArray(f); }
-function feldText(f) { return isComboEntry(f) ? f.text : f; }
+function isObj(x) { return !!x && typeof x === 'object' && !Array.isArray(x); }
+// Zählfeld: Daten { text, zaehlfeld: true, ab, einheit } bzw. Zelle auf der Karte { t, ab, z: true, u }.
+// Es wird hochgezählt (0 bis MAX_ZAHL) und gilt ab dem Schwellwert ab als geschafft.
+const MAX_ZAHL = 999;
+const MAX_EINHEIT = 20;
+function isCounterEntry(f) { return isObj(f) && (f.zaehlfeld === true || f.z === true); }
+function isCounterCell(c) { return isObj(c) && c.z === true; }
+// Kombi-Feld = jedes andere Objekt (Daten { text, punkte, ab } bzw. Zelle { t, p, ab }).
+function isComboEntry(f) { return isObj(f) && !isCounterEntry(f); }
+// Kombi- oder Zählfeld (alles, was kein einfacher Text ist).
+function isSpecialEntry(f) { return isObj(f); }
+function feldText(f) { return isObj(f) ? f.text : f; }
+
+// Prüft ein Zählfeld. Rückgabe: Liste von Fehlertexten (leer = in Ordnung).
+function counterProblems(f) {
+  const out = [];
+  const ok = typeof f.text === 'string' && f.text.trim();
+  const name = ok ? f.text : '(ohne Text)';
+  if (!ok) out.push('Zählfeld ohne text');
+  if (f.zaehlfeld !== undefined && f.zaehlfeld !== true) out.push('Zählfeld "' + name + '": zaehlfeld muss true sein');
+  if (!Number.isInteger(f.ab) || f.ab < 1 || f.ab > MAX_ZAHL) out.push('Zählfeld "' + name + '": ab muss eine ganze Zahl von 1 bis ' + MAX_ZAHL + ' sein');
+  if (f.einheit !== undefined && (typeof f.einheit !== 'string' || !f.einheit.trim() || f.einheit.trim().length > MAX_EINHEIT)) {
+    out.push('Zählfeld "' + name + '": einheit muss ein Text mit 1 bis ' + MAX_EINHEIT + ' Zeichen sein');
+  }
+  if (f.punkte !== undefined || f.eigene !== undefined) out.push('Zählfeld "' + name + '": punkte und eigene gibt es nur bei Kombi-Feldern');
+  return out;
+}
 
 // Prüft ein Kombi-Feld. Rückgabe: Liste von Fehlertexten (leer = in Ordnung).
 // Mit eigene: true darf man zusätzlich eigene Einträge eintragen (Freitext); sie zählen wie abgehakte Punkte.
@@ -76,6 +101,7 @@ function comboProblems(f) {
   const ok = typeof f.text === 'string' && f.text.trim();
   const name = ok ? f.text : '(ohne Text)';
   if (!ok) out.push('Kombi-Feld ohne text');
+  if (f.zaehlfeld !== undefined) out.push('Kombi-Feld "' + name + '": zaehlfeld muss true sein und gehört zu einem Zählfeld (ohne punkte)');
   if (f.eigene !== undefined && typeof f.eigene !== 'boolean') out.push('Kombi-Feld "' + name + '": eigene muss true oder false sein');
   if (f.eigeneHinweis !== undefined && typeof f.eigeneHinweis !== 'string') out.push('Kombi-Feld "' + name + '": eigeneHinweis muss ein Text sein');
   const eig = f.eigene === true;
@@ -109,11 +135,12 @@ function validateGames(list) {
     if (!GROESSEN.includes(g.groesse)) add(id, 'fehler', 'groesse muss 3, 4, 5, 7 oder 9 sein');
     if (!ZIELE.includes(g.ziel)) add(id, 'fehler', "ziel muss 'linie' oder 'vollbild' sein");
     if (g.fest !== undefined && typeof g.fest !== 'boolean') add(id, 'fehler', 'fest muss true oder false sein');
-    if (!Array.isArray(g.felder) || g.felder.some(f => !(typeof f === 'string' ? f.trim() : isComboEntry(f)))) {
-      add(id, 'fehler', 'felder muss eine Liste aus nicht-leeren Texten oder Kombi-Feldern sein');
+    if (!Array.isArray(g.felder) || g.felder.some(f => !(typeof f === 'string' ? f.trim() : isSpecialEntry(f)))) {
+      add(id, 'fehler', 'felder muss eine Liste aus nicht-leeren Texten, Kombi-Feldern oder Zählfeldern sein');
       return;
     }
     g.felder.filter(isComboEntry).forEach(f => comboProblems(f).forEach(m => add(id, 'fehler', m)));
+    g.felder.filter(isCounterEntry).forEach(f => counterProblems(f).forEach(m => add(id, 'fehler', m)));
     const norm = g.felder.map(f => String(feldText(f)).trim().toLowerCase());
     const dups = norm.filter((f, k) => norm.indexOf(f) !== k);
     if (dups.length) add(id, 'fehler', 'doppelte Felder: ' + [...new Set(dups)].join(', '));
@@ -143,7 +170,7 @@ function normalizeGames(list) {
     const ok = x => typeof x === 'string' && x.trim();
     const felder = g.felder.map(f => {
       if (Array.isArray(f) && f.length === 2 && ok(f[0]) && ok(f[1])) { kurz[f[0]] = f[1].trim(); return f[0]; }
-      if (isComboEntry(f) && ok(f.text) && ok(f.kurz)) kurz[f.text] = f.kurz.trim();
+      if (isSpecialEntry(f) && ok(f.text) && ok(f.kurz)) kurz[f.text] = f.kurz.trim();
       return f;
     });
     return Object.assign({}, g, { felder: felder, kurz: kurz });

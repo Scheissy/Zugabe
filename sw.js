@@ -1,4 +1,4 @@
-const CACHE = 'zugabe-v4';
+const CACHE = 'zugabe-v5';
 // Die App besteht aus index.html + css/app.css + den Skripten js/*.js (Reihenfolge wie in
 // index.html). Jede neue Datei hier eintragen - test_split_files.js prüft das.
 const ASSETS = [

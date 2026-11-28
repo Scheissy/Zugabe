@@ -18,12 +18,17 @@
 //                nach jedem ausgefüllten Feld erscheint ein neues); sie zählen wie abgehakte Punkte.
 //                eigeneHinweis ist der Platzhaltertext im Eingabefeld. Mit eigene: true darf punkte auch
 //                weniger als 2 Einträge haben, und ab darf bis punkte + 10 gehen.
+//                oder ein Zählfeld, das man hochzählt und das ab einem Schwellwert als geschafft gilt:
+//                  { text: '5 Tage am Stück Konzerte', zaehlfeld: true, ab: 5, einheit: 'Tage' }
+//                ab = Schwellwert (1 bis 999, je Feld verschieden), einheit = optionaler Zusatz zur Zahl (bis 20 Zeichen).
+//                Beim Tippen öffnet sich ein Dialog mit − / ＋ und Zahleneingabe; das Feld zählt als markiert, sobald der
+//                Zählerstand mindestens ab erreicht; man kann darüber hinaus weiterzählen (6, 10, 15 …).
 //                Kurztexte für große Karten: Ein Feld darf als Paar [text, kurztext] stehen (bei Kombi-Feldern
 //                kurz: '…'). Auf dem Feld steht dann der Kurztext (empfohlen bis 20 Zeichen), der ganze Text
 //                erscheint beim Antippen in der Lupe unter der Karte.
 // Die Prüfung (Eindeutigkeit, genug Felder, …) macht validateGames() in js/01-data.js.
 // Die Spiele unten sind ein Startpunkt und können beliebig geändert oder ergänzt werden.
-const BINGO_DATA_VERSION = 9;
+const BINGO_DATA_VERSION = 10;
 
 // Dummydaten für die Testkarte 9×9: 9 Akteure × 9 Ereignisse = 81 verschiedene Felder mit Kurztext.
 const DUMMY_FELDER = (() => {
@@ -44,11 +49,15 @@ const BINGO_GAMES = [
     felder: [
       { text: 'Gesang in 6 Sprachen', ab: 6, punkte: ['Deutsch', 'Englisch', 'Spanisch', 'Französisch', 'Italienisch', 'Portugiesisch', 'Türkisch', 'Russisch'], eigene: true, eigeneHinweis: 'Weitere Sprache' },
       'Feature vom Band', 'Überraschungsgast auf der Bühne', 'nur einer von 4 Rappern gut', '30 Minuten Verspätung', 'vor Ort erkennen, dass die Band schon kannte', 'Weniger als eine Stunde Hauptact',
-      'Weihnachtskonzert', 'plötzlich selbst on Stage', 'alle in die Knie gehen', 'Kein Le HH B Hal HB Konzert', 'Bands zweimal im Jahr sehen', 'Flinta Moshpit zum Ausruhen', '5 Tage am Stück Konzerte',
+      'Weihnachtskonzert', 'plötzlich selbst on Stage', 'alle in die Knie gehen', 'Kein Le HH B Hal HB Konzert', 'Bands zweimal im Jahr sehen', 'Flinta Moshpit zum Ausruhen',
+      { text: '5 Tage am Stück Konzerte', zaehlfeld: true, ab: 5, einheit: 'Tage' },
       'Keine Zugabe spielen', 'über 2 Stunden Hauptact', 'Neue Location', 'Special Location', 'Signierte Support Vinyl', 'Künstler zu Tränen gerührt', 'Moshpit mit Band',
       'Text oder Akkorde vergessen', 'Künstler freestyled', 'Reunion Konzert', 'Beyoncé auch vom Band', 'T-Shirt kaufen', 'Tagesfestival mit 5 Bands', 'Schallplatte an der Garderobe abgeben',
       'von der Disco raus geworfen werden', 'Musiker aus anderen Bands im Publikum', 'Secu erkennt dich.', 'Wir sind Helden Cover', 'RBF Entdeckung', 'Open Air Konzert', 'Abschiedstournee',
-      'vorher nicht reingehört, dann Vinyl gekauft', '5 Tage ohne Konzert', 'Felix in Berlin besuchen', 'Hip Hop Crew aus den 90ern', 'Unsignierte Vinyl mitnehmen', 'Künstler erkennt dich', '2 unterschiedliche Locations an einem Tag',
+      'vorher nicht reingehört, dann Vinyl gekauft',
+      { text: '5 Tage ohne Konzert', zaehlfeld: true, ab: 5, einheit: 'Tage' },
+      'Felix in Berlin besuchen', 'Hip Hop Crew aus den 90ern', 'Unsignierte Vinyl mitnehmen', 'Künstler erkennt dich',
+      { text: '2 unterschiedliche Locations an einem Tag', zaehlfeld: true, ab: 2, einheit: 'Locations' },
       'Vinyl für Discogs erstellen', '3 Monate vorher Ticket kaufen', 'Ihr Süßmäuse von der Bühne', 'keine Vinyl dabei', 'Dutch Disease Leute quatschen', 'Band zum 5. mal sehen', 'Künstler verteilen Alkohol',
       // Ab hier: Felder, die auf einer zweiten Karte desselben Spiels vorkamen (andere Anordnung). Die ersten 49 Felder bilden
       // die feste Karte; diese hier sind für den Import weiterer Spielstände da.

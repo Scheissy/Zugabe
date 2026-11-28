@@ -62,6 +62,10 @@ function sameCombo(cell, f) {
   const cut = x => String(x).slice(0, MAX_FELD_LEN);
   return cell.ab === f.ab && !!cell.e === (f.eigene === true) && cell.p.length === f.punkte.length && cell.p.every((x, i) => x === cut(f.punkte[i]));
 }
+// Stimmt ein Zählfeld der Karte mit dem Zählfeld im Spiel überein (Schwellwert und Einheit)?
+function sameCounter(cell, f) {
+  return cell.ab === f.ab && (cell.u || '') === (typeof f.einheit === 'string' ? f.einheit.trim().slice(0, MAX_EINHEIT) : '');
+}
 // Prüft eine importierte Karte gegen das Spiel. Rückgabe: { card, problems } - card ist null, sobald etwas nicht passt.
 // Geprüft wird: Kartengröße und Freifeld (sanitizeCard), jedes Feld muss im Spiel vorhanden sein, Kombi-Felder müssen
 // unverändert sein (sonst passen die Häkchen nicht mehr), kein Feld darf doppelt vorkommen.
@@ -76,15 +80,24 @@ function checkImportedCard(game, entry) {
   // Textfelder, die im Spiel inzwischen Kombi-Felder sind, werden umgestellt (mit Hinweis) statt abgelehnt
   const migrated = migrateCombos(game, card);
   const notes = migrated.map(m => '„' + m.text + '“ ist jetzt ein Kombi-Feld (Häkchen pro Punkt)' + (m.wasMarked ? '; die frühere einfache Markierung wurde zurückgesetzt.' : '.'));
-  const plain = new Set(), combos = new Map();
-  game.felder.forEach(f => { if (isComboEntry(f)) combos.set(String(f.text).slice(0, MAX_FELD_LEN), f); else plain.add(String(f).slice(0, MAX_FELD_LEN)); });
-  const seen = new Set(), missing = [], changed = [], dups = [];
+  // Textfelder, die im Spiel inzwischen Zählfelder sind, ebenso: eine frühere Markierung bleibt als Zählerstand erhalten
+  migrateCounters(game, card).forEach(m => notes.push('„' + m.text + '“ ist jetzt ein Zählfeld' + (m.wasMarked ? '; die frühere Markierung gilt als ' + m.wert + ' gezählt.' : '.')));
+  const plain = new Set(), combos = new Map(), counters = new Map();
+  game.felder.forEach(f => {
+    if (isCounterEntry(f)) counters.set(String(f.text).slice(0, MAX_FELD_LEN), f);
+    else if (isComboEntry(f)) combos.set(String(f.text).slice(0, MAX_FELD_LEN), f);
+    else plain.add(String(f).slice(0, MAX_FELD_LEN));
+  });
+  const seen = new Set(), missing = [], changed = [], changedZ = [], dups = [];
   card.cells.forEach(c => {
     if (c === null) return;
-    const key = isComboEntry(c) ? c.t : c;
+    const key = isSpecialEntry(c) ? c.t : c;
     if (seen.has(key)) dups.push(key);
     seen.add(key);
-    if (isComboEntry(c)) {
+    if (isCounterCell(c)) {
+      const f = counters.get(c.t);
+      if (!f) missing.push(c.t); else if (!sameCounter(c, f)) changedZ.push(c.t);
+    } else if (isComboEntry(c)) {
       const f = combos.get(c.t);
       if (!f) missing.push(c.t); else if (!sameCombo(c, f)) changed.push(c.t);
     } else if (!plain.has(c)) missing.push(c);
@@ -92,6 +105,7 @@ function checkImportedCard(game, entry) {
   const list = a => a.slice(0, 3).map(x => '„' + x + '“').join(', ') + (a.length > 3 ? ' …' : '');
   if (missing.length) problems.push(missing.length + (missing.length === 1 ? ' Feld ist' : ' Felder sind') + ' im Spiel nicht vorhanden: ' + list(missing));
   if (changed.length) problems.push('Kombi-Feld hat sich im Spiel geändert: ' + list(changed));
+  if (changedZ.length) problems.push('Zählfeld hat sich im Spiel geändert: ' + list(changedZ));
   if (dups.length) problems.push('Ein Feld kommt mehrfach auf der Karte vor: ' + list(dups));
   return { card: problems.length ? null : card, problems: problems, notes: notes };
 }

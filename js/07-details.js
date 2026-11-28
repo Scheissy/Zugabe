@@ -24,7 +24,7 @@ function openDetails(p) {
   detailPos = p;
   lupePos = p;
   const det = detailsOf(card, p) || {};
-  document.getElementById('detailTitle').textContent = isComboEntry(c) ? c.t : c;
+  document.getElementById('detailTitle').textContent = isSpecialEntry(c) ? c.t : c;
   document.getElementById('detailDate').value = det.d || '';
   document.getElementById('detailInfo').value = det.i || '';
   renderLupe();

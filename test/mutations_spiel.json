@@ -14,7 +14,8 @@
   "test/test_zaehler.js",
   "test/test_auswahl.js",
   "test/test_umstellung.js",
-  "test/test_eigene_zeilen.js"
+  "test/test_eigene_zeilen.js",
+  "test/test_zaehlfeld.js"
  ],
  "mutations": [
   {
@@ -32,8 +33,8 @@
   {
    "name": "M3 Freifeld lässt sich umschalten",
    "file": "js/03-spiel.js",
-   "old": " || card.cells[p] === null || isComboEntry(card.cells[p])) {",
-   "new": " || isComboEntry(card.cells[p])) {"
+   "old": " || card.cells[p] === null || isSpecialEntry(card.cells[p])) {",
+   "new": " || isSpecialEntry(card.cells[p])) {"
   },
   {
    "name": "M4 justWon immer wahr bei Gewinn",
@@ -104,7 +105,7 @@
   {
    "name": "K4 Zähler ignoriert Kombi-Felder",
    "file": "js/03-spiel.js",
-   "old": "card.marks.length + card.cells.filter((c, p) => isComboEntry(c) && isMarked(card, p)).length",
+   "old": "card.marks.length + card.cells.filter((c, p) => isSpecialEntry(c) && isMarked(card, p)).length",
    "new": "card.marks.length"
   },
   {
@@ -128,8 +129,8 @@
   {
    "name": "K8 Kombi-Feld lässt sich wie Textfeld markieren",
    "file": "js/03-spiel.js",
-   "old": " || card.cells[p] === null || isComboEntry(card.cells[p])) {",
-   "new": " || card.cells[p] === null) {"
+   "old": " || card.cells[p] === null || isSpecialEntry(card.cells[p])) {",
+   "new": " || card.cells[p] === null || isCounterCell(card.cells[p])) {"
   },
   {
    "name": "K9 Rückfrage übersieht reine Häkchen",
@@ -410,8 +411,8 @@
   {
    "name": "D11 Hinweispunkt für Info fehlt",
    "file": "js/04-ansicht.js",
-   "old": "${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}",
-   "new": "${m ? ' marked' : ''}${w}"
+   "old": "${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}\" data-p=\"${p}\"${cnt",
+   "new": "${m ? ' marked' : ''}${w}\" data-p=\"${p}\"${cnt"
   },
   {
    "name": "D12 Wischen bricht langes Drücken nicht ab",
@@ -458,8 +459,8 @@
   {
    "name": "B4 Schwelle des Kombi-Felds wird nicht verglichen",
    "file": "js/08-sicherung.js",
-   "old": "return cell.ab === f.ab && ",
-   "new": "return "
+   "old": "const cut = x => String(x).slice(0, MAX_FELD_LEN);\n  return cell.ab === f.ab && ",
+   "new": "const cut = x => String(x).slice(0, MAX_FELD_LEN);\n  return "
   },
   {
    "name": "B5 Einstellungen werden ohne Haken übernommen",
@@ -566,8 +567,8 @@
   {
    "name": "C4 Zählerstand 1 wird gespeichert",
    "file": "js/03-spiel.js",
-   "old": "if (n > 1) card.counts[p] = n; else delete card.counts[p];\n  }, p);\n}\n\nfunction newCardFor",
-   "new": "card.counts[p] = n;\n  }, p);\n}\n\nfunction newCardFor"
+   "old": "if (n > 1) card.counts[p] = n; else delete card.counts[p];\n  }, p);\n}\n\n// Zählerstand eines Zählfelds",
+   "new": "card.counts[p] = n;\n  }, p);\n}\n\n// Zählerstand eines Zählfelds"
   },
   {
    "name": "C5 Zähler bei unmarkierten Feldern bleiben beim Laden",
@@ -692,14 +693,14 @@
   {
    "name": "X1 Gespeicherte Karte wird nicht auf das Kombi-Feld umgestellt",
    "file": "js/02-storage.js",
-   "old": "      if (game && card) migrateCombos(game, card);\n",
-   "new": ""
+   "old": "      if (game && card) { migrateCombos(game, card); migrateCounters(game, card); }\n",
+   "new": "      if (game && card) migrateCounters(game, card);\n"
   },
   {
    "name": "X2 Frühere Markierung des umgestellten Felds bleibt",
    "file": "js/02-storage.js",
-   "old": "    card.marks = card.marks.filter(x => x !== p);\n",
-   "new": ""
+   "old": "    card.cells[p] = comboCell(combos.get(c));\n    card.marks = card.marks.filter(x => x !== p);\n",
+   "new": "    card.cells[p] = comboCell(combos.get(c));\n"
   },
   {
    "name": "X3 Zähler des umgestellten Felds bleibt",
@@ -766,6 +767,132 @@
    "file": "js/04-ansicht.js",
    "old": "el !== document.activeElement) el.parentNode.remove(); });",
    "new": "el !== document.activeElement) el.remove(); });"
+  },
+  {
+   "name": "D11b Hinweispunkt für Info fehlt beim Zählfeld",
+   "file": "js/04-ansicht.js",
+   "old": "${m ? ' marked' : ''}${w}${hasInfo(card, p) ? ' info' : ''}\" data-p=\"${p}\" aria-haspopup",
+   "new": "${m ? ' marked' : ''}${w}\" data-p=\"${p}\" aria-haspopup"
+  },
+  {
+   "name": "X2b Frühere Markierung des Zählfelds bleibt",
+   "file": "js/02-storage.js",
+   "old": "    card.cells[p] = counterCell(f);\n    card.marks = card.marks.filter(x => x !== p);\n",
+   "new": "    card.cells[p] = counterCell(f);\n"
+  },
+  {
+   "name": "ZF1 Zählfeld zählt schon bei 1",
+   "file": "js/03-spiel.js",
+   "old": "if (isCounterCell(c)) return zahlOf(card, p) >= c.ab;",
+   "new": "if (isCounterCell(c)) return zahlOf(card, p) >= 1;"
+  },
+  {
+   "name": "ZF2 Zählfeld zählt erst über dem Schwellwert",
+   "file": "js/03-spiel.js",
+   "old": "if (isCounterCell(c)) return zahlOf(card, p) >= c.ab;",
+   "new": "if (isCounterCell(c)) return zahlOf(card, p) > c.ab;"
+  },
+  {
+   "name": "ZF3 Zählerstand ohne Obergrenze",
+   "file": "js/03-spiel.js",
+   "old": "|| n < 0 || n > MAX_ZAHL) return none;",
+   "new": "|| n < 0) return none;"
+  },
+  {
+   "name": "ZF4 Zählerstand 0 wird gespeichert",
+   "file": "js/03-spiel.js",
+   "old": "if (n > 0) card.stand[p] = n; else delete card.stand[p];",
+   "new": "card.stand[p] = n;"
+  },
+  {
+   "name": "ZF5 Zählfeld lässt sich wie Textfeld markieren",
+   "file": "js/03-spiel.js",
+   "old": "isSpecialEntry(card.cells[p])) {\n    return { changed: false, won: false, justWon: false };",
+   "new": "isComboEntry(card.cells[p])) {\n    return { changed: false, won: false, justWon: false };"
+  },
+  {
+   "name": "ZF6 Markierungen löschen lässt Zählerstände stehen",
+   "file": "js/03-spiel.js",
+   "old": "  card.counts = {};\n  card.stand = {};\n",
+   "new": "  card.counts = {};\n"
+  },
+  {
+   "name": "ZF7 Neue Karte fragt bei Zählerständen nicht nach",
+   "file": "js/04-ansicht.js",
+   "old": " + Object.keys(card.stand || {}).length > 0;",
+   "new": " > 0;"
+  },
+  {
+   "name": "ZF8 Zählerstand auch an Textfeldern gespeichert",
+   "file": "js/02-storage.js",
+   "old": "|| !isCounterCell(cells[p]) || !Number.isInteger(n) || n < 1 || n > MAX_ZAHL) return;",
+   "new": "|| !Number.isInteger(n) || n < 1 || n > MAX_ZAHL) return;"
+  },
+  {
+   "name": "ZF9 Gespeicherter Zählerstand ohne Obergrenze",
+   "file": "js/02-storage.js",
+   "old": "n < 1 || n > MAX_ZAHL) return;\n    stand[p] = n;",
+   "new": "n < 1) return;\n    stand[p] = n;"
+  },
+  {
+   "name": "ZF10 Umstellung setzt Zählerstand falsch",
+   "file": "js/02-storage.js",
+   "old": "wert = Math.min(MAX_ZAHL, Math.max(f.ab, old));",
+   "new": "wert = 1;"
+  },
+  {
+   "name": "ZF11 Gespeicherte Karte wird nicht auf das Zählfeld umgestellt",
+   "file": "js/02-storage.js",
+   "old": "{ migrateCombos(game, card); migrateCounters(game, card); }",
+   "new": "{ migrateCombos(game, card); }"
+  },
+  {
+   "name": "ZF12 Schwelle des Zählfelds wird beim Import nicht verglichen",
+   "file": "js/08-sicherung.js",
+   "old": "return cell.ab === f.ab && (cell.u || '')",
+   "new": "return (cell.u || '')"
+  },
+  {
+   "name": "ZF13 Import stellt Textfeld nicht auf Zählfeld um",
+   "file": "js/08-sicherung.js",
+   "old": "migrateCounters(game, card).forEach(",
+   "new": "[].forEach("
+  },
+  {
+   "name": "ZF14 Schwelle 0 im Zählfeld erlaubt",
+   "file": "js/01-data.js",
+   "old": "!Number.isInteger(f.ab) || f.ab < 1 || f.ab > MAX_ZAHL) out.push('Zählfeld",
+   "new": "!Number.isInteger(f.ab) || f.ab > MAX_ZAHL) out.push('Zählfeld"
+  },
+  {
+   "name": "ZF15 Zählfeld mit punkte wird nicht gemeldet",
+   "file": "js/01-data.js",
+   "old": "if (f.punkte !== undefined || f.eigene !== undefined) out.push(",
+   "new": "if (false) out.push("
+  },
+  {
+   "name": "ZF16 Karte zeigt bei geschafftem Zählfeld keinen Haken",
+   "file": "js/04-ansicht.js",
+   "old": "${m ? '✓ ' + k : k + '/' + c.ab}",
+   "new": "${k + '/' + c.ab}"
+  },
+  {
+   "name": "ZF17 Eingetippte Zahl wird nicht begrenzt",
+   "file": "js/04-ansicht.js",
+   "old": "applyZahl(Math.min(n, MAX_ZAHL), n <= MAX_ZAHL);",
+   "new": "applyZahl(n, true);"
+  },
+  {
+   "name": "ZF18 Plus bleibt bei 999 aktiv",
+   "file": "js/04-ansicht.js",
+   "old": "document.getElementById('zahlPlus').disabled = k >= MAX_ZAHL;",
+   "new": "document.getElementById('zahlPlus').disabled = false;"
+  },
+  {
+   "name": "ZF19 Zurücksetzen setzt auf 1",
+   "file": "js/04-ansicht.js",
+   "old": "function zahlReset() { applyZahl(0, false); }",
+   "new": "function zahlReset() { applyZahl(1, false); }"
   }
  ]
 }

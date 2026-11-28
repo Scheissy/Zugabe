@@ -72,6 +72,31 @@ mit − und ＋ in der Zeile „Anzahl“ (1 bis 99).
   und keine Rückfrage beim Entmarkieren. Bereits gespeicherte Zählerstände bleiben erhalten und erscheinen wieder, wenn der Zähler wieder an ist; sie lassen sich bei
   ausgeschaltetem Zähler nicht ändern. Entmarkiert man ein Feld, geht seine Zählung wie immer verloren.
 
+### Zählfelder (hochzählen, ab einem Schwellwert geschafft)
+
+Für Felder wie „5 Tage am Stück Konzerte“, „5 Tage ohne Konzert“ oder „2 unterschiedliche Locations an einem Tag“: Man zählt weiter hoch
+(6, 10, 15 …), das Feld gilt aber schon ab dem Schwellwert **dieses Felds** als geschafft. Jedes Zählfeld hat seinen eigenen Schwellwert.
+
+```js
+{ text: '5 Tage am Stück Konzerte', zaehlfeld: true, ab: 5, einheit: 'Tage' }
+```
+
+- `zaehlfeld: true` macht den Eintrag zum Zählfeld; `ab`: Schwellwert, ganze Zahl von 1 bis 999; `einheit`: optionaler Zusatz zur Zahl (bis 20 Zeichen,
+  z. B. „Tage“), `kurz: '…'` wie bei anderen Feldern. `punkte` und `eigene` gibt es nur bei Kombi-Feldern und sind hier ein Fehler.
+- **Auf der Karte** zeigt das Feld den Zählerstand: `3/5` solange es noch nicht geschafft ist, danach `✓ 7` (Stand über dem Schwellwert bleibt geschafft).
+- **Antippen** öffnet einen Dialog: − und ＋ zählen um 1, im Zahlenfeld lässt sich direkt eine Zahl eintippen (z. B. 15), „Auf 0 zurücksetzen“ setzt zurück.
+  Alles wird sofort gespeichert. Nimmt man den Stand wieder unter den Schwellwert, fällt das Feld zurück.
+- **Datum und Info:** Beim ersten Erreichen des Schwellwerts trägt die App das Datum ein (Einstellung „Datum automatisch eintragen“). Feld lang drücken öffnet wie bei
+  allen Feldern „Datum & Info“; die Zeile „Anzahl“ gibt es bei Zählfeldern nicht (der Zählerstand ist hier das Zählen).
+- Ein Zählfeld zählt für Linie, Vollbild und „x von y Feldern“ einfach als markiert, sobald der Schwellwert erreicht ist.
+- Die Einstellung „Zähler (Felder mehrfach zählen)“ betrifft Textfelder und lässt Zählfelder unberührt.
+- „Markierungen löschen“ und „Neue Karte“ setzen die Zählerstände zurück (mit Rückfrage, auch wenn ein Stand noch unter dem Schwellwert liegt).
+- **Umstellung:** Wird im Spiel ein Textfeld zum Zählfeld (gleicher Text), ziehen gespeicherte und importierte Karten mit: Das Feld bleibt geschafft, wenn es markiert war
+  (Stand = Schwellwert, oder die frühere Anzahl „×N“, wenn sie größer war); ein unmarkiertes Feld beginnt bei 0. Datum und Info bleiben. Beim Import steht dazu ein Hinweis im Dialog.
+- Der Zählerstand steckt in der Sicherung (Export/Import) und wird beim Import geprüft: nur an Zählfeldern, ganze Zahlen von 1 bis 999. Ein Zählfeld, dessen Schwellwert
+  oder Einheit sich im Spiel geändert hat, lässt die Karte beim Import ablehnen (der Stand würde sonst etwas anderes bedeuten).
+- Mitgeliefert in „Konzerte Bingo Season 10“: „5 Tage am Stück Konzerte“ (ab 5), „5 Tage ohne Konzert“ (ab 5), „2 unterschiedliche Locations an einem Tag“ (ab 2).
+
 ### Sicherung (Export und Import)
 
 Settings → „Sicherung“: Alle Spielstände lassen sich in einer Datei sichern (`zugabe-sicherung-<Datum>.json`) und wieder einlesen,

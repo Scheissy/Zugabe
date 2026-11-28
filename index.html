@@ -107,6 +107,30 @@
 </div>
 </div>
 
+<!-- ZÄHLFELD: ZÄHLERSTAND -->
+<div class="modal-backdrop" id="zahlModal" onclick="modalBackdropClick(event)">
+<div class="modal">
+<div class="modal-header">
+<div class="modal-title" id="zahlTitle"></div>
+<button class="modal-close" onclick="closeModal('zahlModal')" aria-label="Schließen">✕</button>
+</div>
+<div class="modal-body">
+<div class="combo-progress" id="zahlProgress" role="status"></div>
+<div class="zahl-row">
+<button type="button" class="zoom-btn" id="zahlMinus" onclick="zahlStep(-1)" aria-label="Eins weniger">−</button>
+<input type="number" id="zahlInput" class="detail-input zahl-input" inputmode="numeric" min="0" max="999" step="1" aria-label="Zählerstand" oninput="onZahlInput(this.value)" onchange="renderZahlDialog(false)">
+<span class="zahl-unit" id="zahlUnit"></span>
+<button type="button" class="zoom-btn" id="zahlPlus" onclick="zahlStep(1)" aria-label="Eins mehr">＋</button>
+</div>
+<button type="button" class="prog-quick-btn" id="zahlReset" onclick="zahlReset()">Auf 0 zurücksetzen</button>
+<div class="detail-hint">Datum und Info zum Feld: Feld lang drücken.</div>
+</div>
+<div class="modal-footer">
+<button class="form-btn form-btn-save" onclick="closeModal('zahlModal')">Fertig</button>
+</div>
+</div>
+</div>
+
 <div class="modal-backdrop" id="installModal" onclick="modalBackdropClick(event)">
 <div class="modal">
 <div class="modal-header">
